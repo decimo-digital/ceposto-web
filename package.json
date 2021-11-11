@@ -1,0 +1,75 @@
+{
+  "name": "ceposto",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@reach/dialog": "^0.15.2",
+    "@sheet/core": "^1.20210726.1",
+    "@stripe/react-stripe-js": "^1.4.1",
+    "@stripe/stripe-js": "^1.16.0",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^11.2.7",
+    "@testing-library/user-event": "^12.8.3",
+    "axios": "^0.21.1",
+    "dayjs": "^1.10.5",
+    "decamelize": "^4.0.0",
+    "formik": "^2.2.9",
+    "framer-motion": "^4.1.17",
+    "js-cookie": "^2.2.1",
+    "js-sha256": "^0.9.0",
+    "libphonenumber-js": "^1.9.20",
+    "next": "^11.1.0",
+    "next-cookies": "^2.0.3",
+    "nprogress": "^0.2.0",
+    "papaparse": "^5.3.1",
+    "prop-types": "^15.7.2",
+    "react": "^17.0.2",
+    "react-day-picker": "^7.4.10",
+    "react-dom": "^17.0.2",
+    "react-dropzone": "^11.3.4",
+    "react-loading-skeleton": "^2.2.0",
+    "react-redux": "^7.2.4",
+    "react-scripts": "4.0.3",
+    "react-select": "^4.3.1",
+    "react-table": "^7.7.0",
+    "react-tooltip": "^4.2.21",
+    "redux-devtools-extension": "^2.13.9",
+    "redux-thunk": "^2.3.0",
+    "reselect": "^4.0.0",
+    "vercel": "^23.1.2",
+    "web-vitals": "^1.1.2",
+    "xlsx": "^0.17.1"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "start": "next start",
+    "build": "next build",
+    "deploy-staging": "vercel teams switch clikapp && vercel && vercel alias toduba-2-web-lbersano.clikapp.vercel.app toduba-test.clikapp.vercel.app",
+    "deploy-prod": "vercel teams switch clikapp && vercel --prod",
+    "deploy-all": "npm run deploy-staging && npm run deploy-prod"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "autoprefixer": "^9.8.6",
+    "postcss": "^8.3.5",
+    "tailwindcss": "^2.2.4"
+  },
+  "proxy": "http://localhost:5000/"
+}

@@ -1,0 +1,19 @@
+@media (max-width: 639px) {
+  [data-reach-dialog-content] {
+    width: 100vw;
+    margin: 10vh auto;
+    background: white;
+    padding: 2rem;
+    outline: none;
+  }
+}
+
+@media (min-width: 640px) {
+  [data-reach-dialog-content] {
+    width: 50vw;
+    margin: 10vh auto;
+    background: white;
+    padding: 2rem;
+    outline: none;
+  }
+}

@@ -1,0 +1,241 @@
+import Head from 'next/head'
+import Link from 'next/link'
+import Router, { useRouter } from 'next/router'
+import nextCookie from 'next-cookies'
+
+import { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { sha256 } from 'js-sha256'
+
+import Alert from 'components/Alert'
+import Button from 'components/Button'
+import Container from 'components/Container'
+import Input from 'components/Input'
+
+import isObjectEmpty from 'utils/isObjectEmpty'
+import { isValidEmail, isValidPassword } from 'utils/validation'
+import { axiosAuth } from 'utils/axiosInstance'
+
+import { userLogin } from 'state/auth/actions'
+import axios from 'axios'
+
+const Index = () => {
+  const [alert, setAlert] = useState({})
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
+
+  const [fields, setFields] = useState({
+    username: { value: '', invalid: false },
+    password: { value: '', invalid: false }
+  })
+
+  const dispatch = useDispatch()
+
+  const router = useRouter()
+
+  const { registrationEnded, passwordRecovered } = router.query
+
+
+
+  async function handleLogin(e) {
+    e.preventDefault()
+    setAlert({})
+    if (
+      isInputInvalid('username', fields.username.value) ||
+      isInputInvalid('password', fields.password.value)
+    ) {
+    } else {
+      setIsLoggingIn(true)
+      setAlert({})
+      const data = {
+        email: fields.username.value,
+        password: fields.password.value
+      }
+
+      try {
+        console.log(data)
+        const response = await axios.post('https://authservice-smsimone.cloud.okteto.net/api/auth/login', data)
+
+        const { token } = response.data
+
+        await Promise.all([
+          dispatch(userLogin(token)),
+          router.push('/home')
+        ])
+
+      } catch (err) {
+        console.error(err)
+        setIsLoggingIn(false)
+      }
+    }
+  }
+
+  function handleFieldChange(e) {
+    setAlert({})
+    const field = e.target.id
+    const value = e.target.value
+
+    setFields((fields) => {
+      return {
+        ...fields,
+        [field]: { ...fields[field], invalid: false, value }
+      }
+    })
+  }
+
+  function isInputInvalid(field, value) {
+    let invalid = false
+
+    switch (field) {
+      case 'username':
+        invalid = !isValidEmail(value)
+        break
+      case 'password':
+        invalid = !isValidPassword(value)
+        break
+    }
+
+    setFields((fields) => {
+      return {
+        ...fields,
+        [field]: { ...fields[field], value, invalid }
+      }
+    })
+
+    return invalid
+  }
+
+  function handleFieldBlur(e) {
+    setAlert({})
+    const field = e.target.id
+    const value = e.target.value
+
+    isInputInvalid(field, value)
+  }
+
+  return (
+    <>
+      <Head>
+        <title>CePosto | Accedi</title>
+      </Head>
+      <div className="flex flex-col items-center justify-center w-screen min-h-screen space-y-4 bg-black">
+        <Container>
+          <div className="flex flex-col h-auto max-w-md mx-auto text-white">
+            <img
+              src=""
+              className="h-40 p-4"
+              alt="Logo CePosto"
+            />
+            <div className="flex flex-col h-auto bg-white rounded-md shadow-md">
+              {false ? (
+                <>
+                  I nostri server sono attualmente in manutenzione, ci scusiamo
+                  per il disagio e La preghiamo di ritentare più tardi.
+                </>
+              ) : (
+                <div className="px-4 py-8 space-y-8 sm:px-12 ">
+                  {!isObjectEmpty(alert) && <Alert {...alert} />}
+                  <form
+                    className="flex flex-col space-y-8"
+                    onSubmit={handleLogin}
+                  >
+                    <Input
+                      label="Nome utente"
+                      isRequired={true}
+                      isInvalid={fields.username.invalid}
+                      invalidText="Inserire un nome utente valido"
+                      type="email"
+                      value={fields.username.value}
+                      onChange={(e) => handleFieldChange(e)}
+                      onBlur={(e) => handleFieldBlur(e)}
+                      id="username"
+                    />
+                    <Input
+                      label="Password"
+                      type="password"
+                      isRequired={true}
+                      isInvalid={fields.password.invalid}
+                      invalidText="Inserire una password valida"
+                      value={fields.password.value}
+                      onChange={(e) => handleFieldChange(e)}
+                      onBlur={(e) => handleFieldBlur(e)}
+                      id="password"
+                    />
+
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      fullWidth={true}
+                      onClick={(e) => handleLogin(e)}
+                      disabled={isLoggingIn}
+                    >
+                      {isLoggingIn ? 'Accesso in corso...' : 'Entra'}
+                    </Button>
+
+
+                  </form>
+
+                  <Link href="/">
+                    <Button type="button" fullWidth={true} variant="primary">
+                      Registrati ora
+                    </Button>
+                  </Link>
+                  {/* <Link href="/assignMerchant">
+                    <Button type="button" fullWidth={true} variant="primary">
+                      Associa ad un punto vendita
+                    </Button>
+                  </Link> */}
+                </div>
+              )}
+            </div>
+          </div>
+        </Container>
+      </div>
+    </>
+  )
+}
+
+Index.getInitialProps = async (ctx) => {
+  const { token } = nextCookie(ctx)
+  const { reduxStore, res } = ctx
+
+  // Check if backend is in maintenance mode
+  try {
+    await axiosAuth.get('/')
+  } catch (err) {
+    if (
+      err?.response?.status === 499 &&
+      err?.response?.data?.message === 'Server in manutenzione'
+    )
+      return { areServersInMaintenanceMode: true }
+  }
+
+  if (typeof token !== 'undefined') {
+    try {
+      let redirectPage = ''
+      let redirectPageAs = ''
+
+      redirectPage = '/info/[id]'
+      redirectPageAs = '/info/0'
+
+      if (typeof window !== 'undefined') {
+        Router.push(redirectPage, redirectPageAs)
+      } else {
+        res.writeHead(302, { Location: redirectPageAs })
+
+        res.end()
+      }
+    } catch (err) {
+      console.error(err)
+
+      if (
+        err?.response?.status === 500 &&
+        err?.response?.data?.message === 'Impossibile autenticare Token'
+      )
+        reduxStore.dispatch(userLogout())
+    }
+  }
+
+  return {}
+}
+
+export default Index

@@ -1,0 +1,22 @@
+/* purgecss ignore */
+.StripeElement {
+  padding: 0.5rem 1rem;
+  width: 100%;
+  color: #32325d;
+  background-color: white;
+  border: 1px solid #d8d8d8;
+  font-family: 'Red Hat Display, sans-serif';
+  font-size: 1.25rem;
+}
+
+.StripeElement--focus {
+  box-shadow: 0 0 0 3px #5aa972;
+}
+
+.StripeElement--invalid {
+  border-color: '#b21831';
+}
+
+.StripeElement--webkit-autofill {
+  background-color: #fefde5 !important;
+}
