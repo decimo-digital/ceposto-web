@@ -47,7 +47,7 @@ const Index = () => {
       setIsLoggingIn(true)
       setAlert({})
       const data = {
-        email: fields.username.value,
+        username: fields.username.value,
         password: fields.password.value
       }
 
