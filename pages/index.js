@@ -53,7 +53,8 @@ const Index = () => {
 
       try {
         console.log(data)
-        const response = await axios.post('https://authservice-smsimone.cloud.okteto.net/api/auth/login', data)
+        const authservice = process.env.NEXT_PUBLIC_API_SERVER
+        const response = await axios.post(`${authservice}/api/auth/login`, data)
 
         const { token } = response.data
 

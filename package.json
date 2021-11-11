@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "@reach/dialog": "^0.15.2",
-    "@sheet/core": "^1.20210726.1",
     "@stripe/react-stripe-js": "^1.4.1",
     "@stripe/stripe-js": "^1.16.0",
     "@testing-library/jest-dom": "^5.14.1",
