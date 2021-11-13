@@ -19,5 +19,6 @@ COPY --from=build /build/.next ./.next
 RUN npm install next
 
 
-EXPOSE 3000
-CMD npm run start
+EXPOSE 80
+#CMD npx next start --port 80
+ENTRYPOINT [ "npx", "next", "start", "--port", "80" ]
