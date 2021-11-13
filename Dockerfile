@@ -11,5 +11,5 @@ COPY --from=base /base ./
 ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN npm run build
 
-EXPOSE 80
-ENTRYPOINT [ "npx", "next", "start", "--port", "80" ]
+EXPOSE 8080
+ENTRYPOINT [ "npx", "next", "start", "--port", "8080" ]
