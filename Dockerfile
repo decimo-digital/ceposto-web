@@ -4,12 +4,16 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 
-FROM node:current-alpine
+FROM node:current-alpine as builder
 ENV NODE_ENV=production
 WORKDIR /build
 COPY --from=base /base ./
 ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN npm run build
 
-EXPOSE 8080
-ENTRYPOINT [ "npx", "next", "start", "--port", "8080" ]
+FROM smaso/ubuntu_node:latest
+COPY --from=builder /build/.next /.next
+COPY package.json /package.json
+
+EXPOSE 80
+ENTRYPOINT [ "npx", "next", "start", '-p', '80']
