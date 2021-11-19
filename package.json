@@ -41,7 +41,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "start": "next start",
+    "start": "next start -p 80",
     "build": "next build",
     "deploy-staging": "vercel teams switch clikapp && vercel && vercel alias toduba-2-web-lbersano.clikapp.vercel.app toduba-test.clikapp.vercel.app",
     "deploy-prod": "vercel teams switch clikapp && vercel --prod",
