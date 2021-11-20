@@ -13,7 +13,7 @@ module.exports = {
       poll: true
     },
     proxy: {
-      '/api': 'http://authservice:8080'
+      '/api': 'http://authservice:8080/swagger-ui.html'
     }
   }
 };
