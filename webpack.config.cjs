@@ -11,9 +11,6 @@ module.exports = {
     disableHostCheck: true,
     watchOptions: {
       poll: true
-    },
-    proxy: {
-      '/api': 'http://authservice:8080/swagger-ui.html'
     }
   }
 };
