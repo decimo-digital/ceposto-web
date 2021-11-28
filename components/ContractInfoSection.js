@@ -16,7 +16,7 @@ const ContractInfoSection = (props) => {
   try {
     discount = contract.convention_code.discount
     service_cost = contract.convention_code.service_cost
-  } catch {}
+  } catch { }
 
   return (
     <div
@@ -27,8 +27,8 @@ const ContractInfoSection = (props) => {
     >
       <InputGroup
         labelText="Valore del buono"
-        containerClass="w-full"
-        alertClass="w-full"
+        containerclassName="w-full"
+        alertclassName="w-full"
         invalidFlag={invalid}
         invalidText="Inserire un valore valido"
       >

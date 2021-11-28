@@ -1,33 +1,19 @@
 import { useDispatch, useStore } from 'react-redux'
-import { userLogin } from 'state/auth/actions'
 import Link from 'next/link'
 import Head from 'next/head'
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { Router, useRouter } from 'next/router'
-import { sha256 } from 'js-sha256'
-import { AnimatePresence } from 'framer-motion'
+import Router, { useRouter } from 'next/router'
+
 
 import Container from 'components/Container'
-
-import PhaseZero from 'components/signup/PhaseZero'
-import PhaseOneP from 'components/signup/PhaseOneP'
 import PhaseOne from 'components/signup/PhaseOne'
-import PhaseTwo from 'components/signup/PhaseTwo'
-import PhaseThree from 'components/signup/PhaseThree'
-import PhaseFour from 'components/signup/PhaseFour'
 
-import Progress from 'components/Progress'
+import { isValidEmail, isValidPassword } from 'utils/validation'
 
-import { isValidEmail, isValidPassword, isValidOtpCode } from 'utils/validation'
-import { getErrorMessage } from 'utils/errors'
-
-import { unitScopes, otpTypes, paymentModes } from 'utils/enums'
-import axiosRes, { axiosAuth, axiosUsers } from 'utils/axiosInstance'
+import { axiosAuth } from 'utils/axiosInstance'
 import isObjectEmpty from 'utils/isObjectEmpty'
-import { addUnit } from 'state/units/actions'
-import jsCookie from 'js-cookie'
-
 const { isValidPhoneNumber } = require('libphonenumber-js')
+import { userLogin } from 'state/auth/actions'
 
 const variants = {
   enter: {
@@ -96,15 +82,22 @@ const Signup = () => {
     })
   }
 
-  function onSuccesfullRegistration(nome) {
-    setAlert({
-      type: 'success',
-      title: 'Complimenti!',
-      body: `Benvenuto ${nome}, hai completato correttamente la registrazione! \n 
-      Utilizza le tue credenziali per accedere`,
-      animate: true
-    })
-    Router.push('/')
+  async function onSuccesfullRegistration(token, email) {
+    console.log('Sto facendo la login con ', token)
+    try {
+      await Promise.all([
+        dispatch(userLogin(token, email)),
+        router.push('/home')
+      ])
+    } catch (err) {
+      console.error(err)
+      setAlert({
+        type: 'error',
+        title: 'Qualcosa è andato storto',
+        body: 'Si prega di riprovare tra qualche minuto',
+        animate: true
+      })
+    }
   }
 
   async function phaseOneButtonClick(e) {
@@ -153,21 +146,22 @@ const Signup = () => {
             password
           }
 
-          const registrationResponse = await axiosAuth.post(
+          const { data: registrationResponse } = await axiosAuth.post(
             '/register',
             data
           )
-
-          if (registrationResponse.status === 200) {
-            setAlert({})
-            onSuccesfullRegistration()
+          const { accessToken } = registrationResponse
+          console.log(accessToken)
+          if (accessToken) {
+            onSuccesfullRegistration(accessToken, email)
           }
         } catch (err) {
-
+          console.error(err.response.status, err.response.data.message)
           setAlert({
             type: 'error',
             title: 'Qualcosa è andato storto',
-            body: 'Si prega di riprovare tra qualche minuto',
+            body: err.response?.data?.message ?? 'Si prega di riprovare tra qualche minuto'
+            ,
             animate: true
           })
         } finally {

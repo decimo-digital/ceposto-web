@@ -5,12 +5,7 @@ import { useRouter } from 'next/router'
 
 import NavLink from 'components/NavLink'
 
-import { unitScopes } from 'utils/enums'
-import isObjectEmpty from 'utils/isObjectEmpty'
-import Icon, { icons } from 'components/Icon'
-import MobileMenu from 'components/MobileMenu'
 import { useState, useEffect } from 'react'
-import { AnimatePresence } from 'framer-motion'
 
 import Navbar from 'components/Navbar'
 
@@ -26,7 +21,7 @@ function Layout({ children, title = 'CePosto' }) {
 
   const router = useRouter()
 
-  const user = useSelector((state) => state?.units?.data?.[currUnitIndex])
+  const user = useSelector((state) => state?.user)
 
   useEffect(() => {
     if (isMobileMenuOpen) setIsMobileMenuOpen(false)
@@ -47,7 +42,7 @@ function Layout({ children, title = 'CePosto' }) {
       />
 
       <NavLink
-        pathname={`/profile`}
+        pathname={`/profile/${user.id}`}
         text={`Profilo`}
       />
     </>
@@ -64,7 +59,7 @@ function Layout({ children, title = 'CePosto' }) {
           <header className="bg-black sticky top-0 z-10">
 
 
-            <Navbar />
+            <Navbar userId={user.id} />
           </header>
           <main className="w-full h-full bg-gray-100">
             <div className="grid">{children}</div>

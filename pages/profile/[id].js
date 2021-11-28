@@ -114,12 +114,12 @@ const Profile = ({ merchant }) => {
       <Head>
         <title>CePosto | Profilo</title>
       </Head>
-      <div class="w-full">
+      <div className="w-full">
         {!isObjectEmpty(alert) && (
           <AlertFloat alert={alert} setAlert={setAlert} />
         )}
         <div className='p-10'>
-          <div class="container w-100 lg:w-4/5 mx-auto flex flex-col space-y-4">
+          <div className="container w-100 lg:w-4/5 mx-auto flex flex-col space-y-4">
 
             <div id='info' className='w-full text-center'>
               <h2 className='text-center text-3xl'>Info personali</h2>

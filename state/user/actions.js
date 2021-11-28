@@ -10,10 +10,10 @@ const UPDATE_USER = 'UPDATE_USER'
 const getUserByEmail = email => {
   return async (dispatch, getState) => {
     const { token } = getState().auth
-
-    const { data: user } = await axios.get('/users/me', {
-      headers: { 'x-access-token': token },
-    })
+    const { data: user } = await axiosUsers.get(`/`,
+      {
+        headers: { 'access-token': token },
+      })
 
     dispatch({ type: GET_USER, payload: { user } })
   }

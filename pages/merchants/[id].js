@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useSelector } from 'react-redux'
 import nextCookie from 'next-cookies'
 import { initializeStore } from 'state/store'
 import { Router } from 'next/router'
@@ -12,67 +13,44 @@ import Dialog from 'components/Dialog'
 import AlertFloat from 'components/AlertFloat'
 import isObjectEmpty from 'utils/isObjectEmpty'
 import Input from 'components/Input'
-import { axiosPrenotation } from 'utils/axiosInstance'
+import { axiosMerchant, axiosPrenotation } from 'utils/axiosInstance'
 import Infobox from 'components/Infobox'
 import InputBook from 'components/InputBook'
 import MerchantCard from 'components/MerchantCard'
 
-const Merchants = ({ merchant }) => {
+const Merchants = (props) => {
   const [requestingSeats, setRequestingSeats] = useState(1)
   const [alert, setAlert] = useState(false)
   const [isOpenDialog, setIsOpenDialog] = useState(false)
   const [isSendingRequest, setIsSendingRequest] = useState(false)
 
-  const restaurants = [
-    {
-      id: 1,
-      name: 'Da Lillo',
-      description: 'Porcaccia la madonna, avqua a 8€',
-      image: 'r1.jpg'
-    },
-    {
-      id: 2,
-      name: 'Pescaria',
-      description: 'Mannaggia se è buono il pesce qua',
-      image: 'r2.jpg',
-    },
-    {
-      id: 3,
-      name: 'Cannavacciuolo Bistrot',
-      description: 'Hai cagato?',
-      image: 'r4.jpg'
-    },
-    {
-      id: 4,
-      name: 'La Cadrega',
-      description: 'Mangiare qui è un inganno',
-      image: 'cadrega.jpg'
-    }
-  ]
+  const user = useSelector(state => state.user)
+  console.log(user)
 
-  const sendPrenotationRequest = () => {
+  const sendPrenotationRequest = async () => {
     console.log('Invio prenotazione...')
     setIsSendingRequest(true)
     try {
-      // const response = await axiosPrenotation(
-      //   '/', {
-      //   merchantId: currentMerchant.id,
-      //   seatsAmount: requestingSeats,
-      //   date: dayjs(),
-      //   requesterId: 0
-      // }
-      // )
-      console.log(
+      const response = await axiosPrenotation.post(
+        '/', {
+        merchantId: currentMerchant.id,
+        seatsAmount: requestingSeats,
+        date: dayjs(),
+        requesterId: user.id
+      },
+        { headers: { 'access-token': props.token } }
+      )
+      console.log(response,
         {
           merchantId: currentMerchant.id,
           seatsAmount: requestingSeats,
           date: dayjs(),
-          requesterId: 0
+          requesterId: user.id
         }
       )
       setAlert({
         type: 'success',
-        title: ` ${currentMerchant.name} ti aspetta!`,
+        title: ` ${currentMerchant.storeName} ti aspetta!`,
         body: ` Puoi trovare la tua prenotazione nella sezione apposita del sito`
 
       })
@@ -106,8 +84,8 @@ const Merchants = ({ merchant }) => {
     }
   }
 
-  const currentMerchant = typeof merchant !== 'undefined'
-    ? merchant
+  const currentMerchant = typeof props.merchant !== 'undefined'
+    ? props.merchant
     : {
       merchantId: 1,
       name: 'Cannavacciuolo Bistrot',
@@ -123,26 +101,26 @@ const Merchants = ({ merchant }) => {
   return (
     <>
       <Head>
-        <title>Prenota | {currentMerchant.name}</title>
+        <title>Prenota | {currentMerchant.storeName}</title>
       </Head>
-      <div class="w-full">
+      <div className="w-full">
         {!isObjectEmpty(alert) && (
           <AlertFloat alert={alert} setAlert={setAlert} />
         )}
 
-        <div class="md:flex md:space-x-10 items-center bg-black p-24">
-          <div class="w-full h-full text-center">
+        <div className="md:flex md:space-x-10 items-center bg-black p-24">
+          <div className="w-full h-full text-center">
 
-            <p className='bold text-5xl text-white'> {currentMerchant.name} </p>
+            <p className='bold text-5xl text-white'> {currentMerchant.storeName} </p>
 
           </div>
         </div>
 
         <div className='p-10'>
-          <div class="container w-100 lg:w-4/5 mx-auto flex flex-col space-y-4">
+          <div className="container w-100 lg:w-4/5 mx-auto flex flex-col space-y-4">
             <div id='longDescr'>
               {
-                currentMerchant.longDescr
+                currentMerchant.description
               }
               <p>
                 Controlla la disponibilità e prenota un tavolo!
@@ -179,7 +157,7 @@ const Merchants = ({ merchant }) => {
 
             <div className='container w-100 lg:w-4/5 mx-auto flex flex-col'>
               Ai nostri clienti piace anche. . .
-              <div className='border border-1 border-gray-200 rounded-md '>
+              {/* <div className='border border-1 border-gray-200 rounded-md '>
                 {
                   restaurants
                     .filter((rs, i) => i < 3)
@@ -203,7 +181,7 @@ const Merchants = ({ merchant }) => {
                       }
                     )
                 }
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -216,7 +194,7 @@ const Merchants = ({ merchant }) => {
         }}
       >
         <div className="mt-4 space-y-8">
-          <h2 class='font-medium text-2xl text-gray-500'>
+          <h2 className='font-medium text-2xl text-gray-500'>
             Prenotazione
           </h2>
           <span>Seleziona il numero di posti:</span>
@@ -273,28 +251,33 @@ Merchants.getInitialProps = async (context) => {
   const { res } = context
   const reduxStore = initializeStore()
   let { token } = nextCookie(context)
-  // try {
-  //   token = checkToken({
-  //     tokenFromStorage: token,
-  //     tokenInQueryString: context.query.token
-  //   })
-  // } catch (err) {
-  //   if (typeof window !== 'undefined') Router.push('/')
-  //   else {
-  //     res.writeHead(302, {Location: '/' })
-  //     res.end()
-  //   }
-  // }
+  try {
+    token = checkToken({
+      tokenFromStorage: token,
+      tokenInQueryString: context.query.token
+    })
+  } catch (err) {
+    if (typeof window !== 'undefined') Router.push('/')
+    else {
+      res.writeHead(302, { Location: '/' })
+      res.end()
+    }
+  }
 
   try {
+    console.log('--->', context.query)
     const urlCurrentMerchant = Number(context.query.id)
+    console.log(urlCurrentMerchant)
+    const username = reduxStore.getState().auth.username
+    await initStore(reduxStore, token, username)
 
-    //await initStore(reduxStore, token, urlCurrentUnitIndex)
+    console.log(urlCurrentMerchant, username)
 
-    // const merchant = await axiosRes.get(
-    //   `/${urlCurrentMerchant}`,
-    //   { headers: { 'x-access-token': token } }
-    // )
+    const { data: merchant } = await axiosMerchant.get(
+      `/${urlCurrentMerchant}/data`,
+      { headers: { 'access-token': token } }
+    )
+
 
 
     // return {
@@ -303,7 +286,7 @@ Merchants.getInitialProps = async (context) => {
     //   initialReduxState: reduxStore.getState()
     // }
 
-    return {}
+    return { token, merchant }
   } catch (err) {
     console.error(err)
 

@@ -458,7 +458,7 @@ function UserForm({
                                 }
                                 key={i}
                               >
-                                <div class="absolute top-0 right-0">
+                                <div className="absolute top-0 right-0">
                                   <button
                                     disabled={!checkBp}
                                     type="button"
@@ -482,7 +482,7 @@ function UserForm({
                                   </button>
                                 </div>
 
-                                <div class="text-center inline-block">
+                                <div className="text-center inline-block">
                                   <p>{ticketOption.ticket_value}€</p>
                                 </div>
                               </RadioCard>

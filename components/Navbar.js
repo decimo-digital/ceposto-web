@@ -2,7 +2,7 @@ import React from "react";
 import Icon, { icons } from "./Icon";
 import Link from 'next/link'
 
-export default function Navbar({ fixed }) {
+export default function Navbar({ userId }) {
   const [navbarOpen, setNavbarOpen] = React.useState(false);
   return (
     <>
@@ -56,7 +56,7 @@ export default function Navbar({ fixed }) {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link href={`/profile/1`}>
+                <Link href={`/profile/${userId}`}>
                   <a
                     className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
                   >

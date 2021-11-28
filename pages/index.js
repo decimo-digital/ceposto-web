@@ -3,9 +3,8 @@ import Link from 'next/link'
 import Router, { useRouter } from 'next/router'
 import nextCookie from 'next-cookies'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { sha256 } from 'js-sha256'
 
 import Alert from 'components/Alert'
 import Button from 'components/Button'
@@ -16,8 +15,7 @@ import isObjectEmpty from 'utils/isObjectEmpty'
 import { isValidEmail, isValidPassword } from 'utils/validation'
 import { axiosAuth } from 'utils/axiosInstance'
 
-import { userLogin } from 'state/auth/actions'
-import axios from 'axios'
+import { userLogin, userLogout } from 'state/auth/actions'
 
 const Index = () => {
   const [alert, setAlert] = useState({})
@@ -45,7 +43,7 @@ const Index = () => {
       setIsLoggingIn(true)
       setAlert({})
       const data = {
-        email: fields.username.value,
+        username: fields.username.value,
         password: fields.password.value
       }
 
@@ -53,10 +51,10 @@ const Index = () => {
         //console.log(data)
         const response = await axiosAuth.post('/login', data)
 
-        const { token } = response.data
+        const { accessToken } = response.data
 
         await Promise.all([
-          dispatch(userLogin(token)),
+          dispatch(userLogin(accessToken, fields.username.value)),
           router.push('/home')
         ])
 
@@ -191,38 +189,38 @@ const Index = () => {
   )
 }
 
-// Index.getInitialProps = async (ctx) => {
-//   const { token } = nextCookie(ctx)
-//   const { reduxStore, res } = ctx
+Index.getInitialProps = async (ctx) => {
+  const { token } = nextCookie(ctx)
+  const { reduxStore, res } = ctx
 
 
-//   if (typeof token !== 'undefined') {
-//     try {
-//       let redirectPage = ''
-//       let redirectPageAs = ''
+  if (typeof token !== 'undefined') {
+    try {
+      let redirectPage = ''
+      let redirectPageAs = ''
 
-//       redirectPage = '/info/[id]'
-//       redirectPageAs = '/info/0'
+      redirectPage = '/home'
+      redirectPageAs = '/home'
 
-//       if (typeof window !== 'undefined') {
-//         Router.push(redirectPage, redirectPageAs)
-//       } else {
-//         res.writeHead(302, { Location: redirectPageAs })
+      if (typeof window !== 'undefined') {
+        Router.push(redirectPage, redirectPageAs)
+      } else {
+        res.writeHead(302, { Location: redirectPageAs })
 
-//         res.end()
-//       }
-//     } catch (err) {
-//       console.error(err)
+        res.end()
+      }
+    } catch (err) {
+      console.error(err)
 
-//       if (
-//         err?.response?.status === 500 &&
-//         err?.response?.data?.message === 'Impossibile autenticare Token'
-//       )
-//         reduxStore.dispatch(userLogout())
-//     }
-//   }
+      if (
+        err?.response?.status === 500 &&
+        err?.response?.data?.message === 'Impossibile autenticare Token'
+      )
+        reduxStore.dispatch(userLogout())
+    }
+  }
 
-//   return {}
-// }
+  return {}
+}
 
 export default Index

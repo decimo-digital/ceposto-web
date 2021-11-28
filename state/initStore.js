@@ -13,20 +13,15 @@ import isObjectEmpty from '../utils/isObjectEmpty'
 import { setCurrentUnitIndex } from './currentUnitIndex/actions'
 import Router from 'next/router'
 
-async function initStore(store, token = '', urlCurrentUnitIndex) {
+async function initStore(store, token = '', username) {
   try {
-    await store.dispatch(userLogin(token))
+    await store.dispatch(userLogin(token, username))
 
     if (isObjectEmpty(store.getState().user)) {
       const email = store.getState().auth.username
       await store.dispatch(getUserByEmail(email))
     }
 
-    if (isObjectEmpty(store.getState().units))
-      await store.dispatch(getOwnerUnits())
-
-    if (urlCurrentUnitIndex)
-      store.dispatch(setCurrentUnitIndex(urlCurrentUnitIndex))
   } catch (err) {
     console.error('SONO NELLA INIT')
 

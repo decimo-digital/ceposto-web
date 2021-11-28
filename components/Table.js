@@ -37,9 +37,8 @@ const TableCell = (props) => (
   <td
     id={props.id}
     style={props.fixLeft ? { position: 'sticky', left: '0px', zIndex: 0 } : {}}
-    className={`p-1  overflow-x-hidden bg-white whitespace-nowrap ${
-      props.borders
-    } ${props.rowIndex % 2 || props.isLoading ? 'bg-white' : 'bg-gray-200'}`}
+    className={`p-1  overflow-x-hidden bg-white whitespace-nowrap ${props.borders
+      } ${props.rowIndex % 2 || props.isLoading ? 'bg-white' : 'bg-gray-200'}`}
   >
     {props.isLoading ? <Skeleton height={24} /> : props.children}
   </td>
@@ -127,9 +126,8 @@ const Table = ({
         // needs to be removed
         else left = Number(left.substring(0, left.length - 2))
 
-        document.getElementById(tds[i].nextSibling.id).style.left = `${
-          tds[i].offsetWidth + left - 1
-        }px`
+        document.getElementById(tds[i].nextSibling.id).style.left = `${tds[i].offsetWidth + left - 1
+          }px`
       }
     }
 
@@ -142,9 +140,8 @@ const Table = ({
         if (left === '') left = 0
         else left = Number(left.substring(0, left.length - 2))
 
-        document.getElementById(ths[i].nextSibling.id).style.left = `${
-          ths[i].offsetWidth + left - 1
-        }px`
+        document.getElementById(ths[i].nextSibling.id).style.left = `${ths[i].offsetWidth + left - 1
+          }px`
       }
     }
   }, [data])
@@ -191,9 +188,8 @@ const Table = ({
           <div className="flex items-end">
             <button
               type="button"
-              className={`flex-grow-0 p-2 px-4 bg-gray-300 cursor-pointer rounded-l-md ${
-                pageIndex <= 1 || !canPreviousPage ? 'opacity-50' : ''
-              }`}
+              className={`flex-grow-0 p-2 px-4 bg-gray-300 cursor-pointer rounded-l-md ${pageIndex <= 1 || !canPreviousPage ? 'opacity-50' : ''
+                }`}
               onClick={(e) => previousPage()}
               disabled={pageIndex <= 1 || !canPreviousPage}
             >
@@ -206,9 +202,8 @@ const Table = ({
             </div>
             <button
               type="button"
-              className={`flex-grow-0 p-2 px-4 bg-gray-300 cursor-pointer rounded-r-md ${
-                !canNextPage ? 'opacity-50' : ''
-              }`}
+              className={`flex-grow-0 p-2 px-4 bg-gray-300 cursor-pointer rounded-r-md ${!canNextPage ? 'opacity-50' : ''
+                }`}
               onClick={(e) => nextPage()}
               disabled={!canNextPage}
             >
@@ -219,9 +214,8 @@ const Table = ({
             <div className="flex">
               <button
                 type="button"
-                className={`flex p-4 bg-gray-300 items-center ${
-                  loading ? 'cursor-not-allowed' : 'cursor-pointer'
-                } rounded-md
+                className={`flex p-4 bg-gray-300 items-center ${loading ? 'cursor-not-allowed' : 'cursor-pointer'
+                  } rounded-md
                   }`}
                 onClick={exportData}
                 disabled={loading}
@@ -248,9 +242,8 @@ const Table = ({
                     }}
                   >
                     <span
-                      className={`flex justify-center items-center h-full uppercase font-medium text-sm ${
-                        filterByType === '' ? 'text-green-800' : 'text-gray-700'
-                      }`}
+                      className={`flex justify-center items-center h-full uppercase font-medium text-sm ${filterByType === '' ? 'text-green-800' : 'text-gray-700'
+                        }`}
                     >
                       Tutti
                     </span>
@@ -262,11 +255,10 @@ const Table = ({
                     }}
                   >
                     <span
-                      className={`flex justify-center items-center h-full uppercase font-medium text-sm ${
-                        filterByType === 'tckt_purchase'
+                      className={`flex justify-center items-center h-full uppercase font-medium text-sm ${filterByType === 'tckt_purchase'
                           ? 'text-green-800'
                           : 'text-gray-700'
-                      }`}
+                        }`}
                     >
                       buoni pasto
                     </span>
@@ -278,11 +270,10 @@ const Table = ({
                     }}
                   >
                     <span
-                      className={`flex justify-center items-center h-full uppercase font-medium text-sm ${
-                        filterByType === 'smart_gift'
+                      className={`flex justify-center items-center h-full uppercase font-medium text-sm ${filterByType === 'smart_gift'
                           ? 'text-green-800'
                           : 'text-gray-700'
-                      }`}
+                        }`}
                     >
                       spese aziendali
                     </span>
@@ -294,11 +285,10 @@ const Table = ({
                     }}
                   >
                     <span
-                      className={`flex justify-center items-center h-full uppercase font-medium text-sm ${
-                        filterByType === 'smart_gift'
+                      className={`flex justify-center items-center h-full uppercase font-medium text-sm ${filterByType === 'smart_gift'
                           ? 'text-green-800'
                           : 'text-gray-700'
-                      }`}
+                        }`}
                     >
                       benefit
                     </span>
@@ -308,7 +298,7 @@ const Table = ({
             )}
             <div className="flex flex-row">
               {filterBy && (
-                <div className containerClass="w-full sm:w-1/2">
+                <div className containerclassName="w-full sm:w-1/2">
                   <Input
                     label={`Filtra per ${columns
                       .map((column) => {
@@ -347,9 +337,8 @@ const Table = ({
                         {...column.getHeaderProps()}
                       >
                         <div
-                          className={`flex items-center ${
-                            column.hasDivider ? 'border-r' : ''
-                          } px-1 gap-4 py-2 whitespace-nowrap`}
+                          className={`flex items-center ${column.hasDivider ? 'border-r' : ''
+                            } px-1 gap-4 py-2 whitespace-nowrap`}
                         >
                           {column.render('Header')}
                           {Object.keys(headersActionsComponents).includes(

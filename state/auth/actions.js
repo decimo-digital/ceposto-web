@@ -7,7 +7,8 @@ const USER_LOGIN = 'USER_LOGIN'
 const USER_LOGOUT = 'USER_LOGOUT'
 
 // Actions
-const userLogin = (token) => {
+const userLogin = (token, email) => {
+  console.log('userLogin ', token)
   return async function login(dispatch, getState) {
     let options = {
       expires: 0.25, // six hours
@@ -18,15 +19,8 @@ const userLogin = (token) => {
     if (typeof cookie.get('token') === 'undefined')
       cookie.set('token', token, options)
 
-    if (typeof token !== 'undefined' && isObjectEmpty(getState().auth)) {
-      const { data } = await axiosAuth.post(
-        '/decoder',
-        {},
-        { headers: { 'x-access-token': token } }
-      )
+    dispatch({ type: USER_LOGIN, payload: { token, username: email } })
 
-      dispatch({ type: USER_LOGIN, payload: { token, username: data.email } })
-    }
   }
 }
 
