@@ -14,8 +14,6 @@ import { AnimatePresence } from 'framer-motion'
 
 import Navbar from 'components/Navbar'
 
-import Aside from './Aside'
-
 const selectCurrUnitIndex = createSelector(
   (state) => state.currentUnitIndex || 0,
   (currentIndex) => currentIndex
