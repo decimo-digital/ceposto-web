@@ -9,7 +9,9 @@ const Button = ({
   fullWidth = false,
   fullHeight = false,
   upperCase = false,
-  className = ''
+  className = '',
+  noRoundTop = false,
+  noRoundDown = false
 }) => {
   let style = ' '
 
@@ -46,7 +48,12 @@ const Button = ({
       disabled={disabled}
       onClick={onClick}
       className={`${style} ${disabled ? 'cursor-not-allowed' : ''
-        } rounded-md px-4 py-2 ${upperCase ? 'uppercase' : ''} ${fullWidth ? 'w-full' : 'w-full sm:w-auto'
+        } ${noRoundDown
+          ? 'rounded-tl-md rounded-tr-md '
+          : noRoundTop
+            ? 'rounded-b-md'
+            : 'rounded-md '} 
+        px-4 py-2 ${upperCase ? 'uppercase' : ''} ${fullWidth ? 'w-full' : 'w-full sm:w-auto'
         } ${fullHeight ? 'h-full' : 'h-auto'} ${className}`}
     >
       {children}

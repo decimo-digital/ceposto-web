@@ -20,7 +20,7 @@ const Dialog = ({ isOpen, handleDismiss, children, ...props }) => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0 }}
           >
-            <ReachDialogContent {...props} style={{ borderRadius: '6px' }}>
+            <ReachDialogContent {...props} style={{ borderRadius: '6px', width: '400px' }}>
               {children}
             </ReachDialogContent>
           </motion.div>

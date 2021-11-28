@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import Icon, { icons } from 'components/Icon'
 
-const Input = ({
+const InputBook = ({
   id,
   value,
   onChange,
@@ -46,7 +46,7 @@ const Input = ({
           type={inputType}
           min={type === 'currency' ? 0 : undefined}
           step={type === 'currency' ? 0.01 : 1}
-          className="w-full p-2 focus:outline-none focus:shadow-outline text-black rounded-md "
+          className="w-full p-2 focus:outline-none focus:shadow-outline text-black rounded-md text-center"
           value={value}
           onChange={onChange}
           onBlur={onBlur}
@@ -75,9 +75,9 @@ const Input = ({
   )
 }
 
-Input.displayName = 'Input'
+InputBook.displayName = 'InputBook'
 
-Input.propTypes = {
+InputBook.propTypes = {
   id: PropTypes.string,
   value: PropTypes.string,
   onChange: PropTypes.func,
@@ -90,4 +90,4 @@ Input.propTypes = {
   invalidText: PropTypes.string
 }
 
-export default Input
+export default InputBook

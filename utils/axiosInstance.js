@@ -5,19 +5,11 @@ const axiosAuth = axios.create({
 })
 
 const axiosMerchant = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_API_SERVER}/merchants`
+  baseURL: `${process.env.NEXT_PUBLIC_API_SERVER}/merchant`
 })
 
-const axiosBanking = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_API_SERVER}/banking`
-})
-
-const axiosUsers = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_API_SERVER}/users`
-})
-
-const axiosUnits = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_API_SERVER}/units`
+const axiosPrenotation = axios.create({
+  baseURL: `${process.env.NEXT_PUBLIC_API_SERVER}/prenotation`
 })
 
 const axiosRes = axios.create({
@@ -28,7 +20,5 @@ export {
   axiosRes as default,
   axiosAuth,
   axiosMerchant,
-  axiosBanking,
-  axiosUsers,
-  axiosUnits
+  axiosPrenotation
 }

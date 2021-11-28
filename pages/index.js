@@ -34,8 +34,6 @@ const Index = () => {
 
   const { registrationEnded, passwordRecovered } = router.query
 
-
-
   async function handleLogin(e) {
     e.preventDefault()
     setAlert({})
@@ -47,14 +45,13 @@ const Index = () => {
       setIsLoggingIn(true)
       setAlert({})
       const data = {
-        username: fields.username.value,
+        email: fields.username.value,
         password: fields.password.value
       }
 
       try {
-        console.log(data)
-        const authservice = process.env.NEXT_PUBLIC_API_SERVER
-        const response = await axios.post(`${authservice}/api/auth/login`, data)
+        //console.log(data)
+        const response = await axiosAuth.post('/login', data)
 
         const { token } = response.data
 
@@ -65,6 +62,12 @@ const Index = () => {
 
       } catch (err) {
         console.error(err)
+        setAlert({
+          type: 'error',
+          title: 'Qualcosa è andato storto',
+          body: 'Si prega di riprovare tra qualche minuto',
+          animate: true
+        })
         setIsLoggingIn(false)
       }
     }
@@ -120,10 +123,10 @@ const Index = () => {
       </Head>
       <div className="flex flex-col items-center justify-center w-screen min-h-screen space-y-4 bg-black">
         <Container>
-          <div className="flex flex-col h-auto max-w-md mx-auto text-white">
+          <div className="flex flex-col h-auto max-w-md mx-auto">
             <img
               src=""
-              className="h-40 p-4"
+              className="h-40 p-4 text-white text-center"
               alt="Logo CePosto"
             />
             <div className="flex flex-col h-auto bg-white rounded-md shadow-md">
@@ -171,20 +174,13 @@ const Index = () => {
                     >
                       {isLoggingIn ? 'Accesso in corso...' : 'Entra'}
                     </Button>
-
-
                   </form>
 
-                  <Link href="/">
+                  <Link href="/signup">
                     <Button type="button" fullWidth={true} variant="primary">
                       Registrati ora
                     </Button>
                   </Link>
-                  {/* <Link href="/assignMerchant">
-                    <Button type="button" fullWidth={true} variant="primary">
-                      Associa ad un punto vendita
-                    </Button>
-                  </Link> */}
                 </div>
               )}
             </div>
@@ -195,48 +191,38 @@ const Index = () => {
   )
 }
 
-Index.getInitialProps = async (ctx) => {
-  const { token } = nextCookie(ctx)
-  const { reduxStore, res } = ctx
+// Index.getInitialProps = async (ctx) => {
+//   const { token } = nextCookie(ctx)
+//   const { reduxStore, res } = ctx
 
-  // Check if backend is in maintenance mode
-  try {
-    await axiosAuth.get('/')
-  } catch (err) {
-    if (
-      err?.response?.status === 499 &&
-      err?.response?.data?.message === 'Server in manutenzione'
-    )
-      return { areServersInMaintenanceMode: true }
-  }
 
-  if (typeof token !== 'undefined') {
-    try {
-      let redirectPage = ''
-      let redirectPageAs = ''
+//   if (typeof token !== 'undefined') {
+//     try {
+//       let redirectPage = ''
+//       let redirectPageAs = ''
 
-      redirectPage = '/info/[id]'
-      redirectPageAs = '/info/0'
+//       redirectPage = '/info/[id]'
+//       redirectPageAs = '/info/0'
 
-      if (typeof window !== 'undefined') {
-        Router.push(redirectPage, redirectPageAs)
-      } else {
-        res.writeHead(302, { Location: redirectPageAs })
+//       if (typeof window !== 'undefined') {
+//         Router.push(redirectPage, redirectPageAs)
+//       } else {
+//         res.writeHead(302, { Location: redirectPageAs })
 
-        res.end()
-      }
-    } catch (err) {
-      console.error(err)
+//         res.end()
+//       }
+//     } catch (err) {
+//       console.error(err)
 
-      if (
-        err?.response?.status === 500 &&
-        err?.response?.data?.message === 'Impossibile autenticare Token'
-      )
-        reduxStore.dispatch(userLogout())
-    }
-  }
+//       if (
+//         err?.response?.status === 500 &&
+//         err?.response?.data?.message === 'Impossibile autenticare Token'
+//       )
+//         reduxStore.dispatch(userLogout())
+//     }
+//   }
 
-  return {}
-}
+//   return {}
+// }
 
 export default Index

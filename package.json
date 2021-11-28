@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@reach/dialog": "^0.15.2",
+    "@sheet/core": "^1.20210726.1",
     "@stripe/react-stripe-js": "^1.4.1",
     "@stripe/stripe-js": "^1.16.0",
     "@testing-library/jest-dom": "^5.14.1",
@@ -14,6 +15,7 @@
     "decamelize": "^4.0.0",
     "formik": "^2.2.9",
     "framer-motion": "^4.1.17",
+    "google-maps-react": "^2.0.6",
     "js-cookie": "^2.2.1",
     "js-sha256": "^0.9.0",
     "libphonenumber-js": "^1.9.20",
@@ -26,6 +28,7 @@
     "react-day-picker": "^7.4.10",
     "react-dom": "^17.0.2",
     "react-dropzone": "^11.3.4",
+    "react-google-maps": "^9.4.5",
     "react-loading-skeleton": "^2.2.0",
     "react-redux": "^7.2.4",
     "react-scripts": "4.0.3",
@@ -41,10 +44,10 @@
   },
   "scripts": {
     "dev": "next dev",
-    "start": "next start -p 80",
+    "start": "next start",
     "build": "next build",
-    "deploy-staging": "vercel teams switch clikapp && vercel && vercel alias toduba-2-web-lbersano.clikapp.vercel.app toduba-test.clikapp.vercel.app",
-    "deploy-prod": "vercel teams switch clikapp && vercel --prod",
+    "deploy-staging": "",
+    "deploy-prod": "",
     "deploy-all": "npm run deploy-staging && npm run deploy-prod"
   },
   "eslintConfig": {

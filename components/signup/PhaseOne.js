@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 
-import FloatingLabelInput from 'components/FloatingLabelInput'
+import Input from 'components/Input'
 import Alert from 'components/Alert'
 
 import isObjectEmpty from 'utils/isObjectEmpty'
@@ -13,7 +13,6 @@ function PhaseOne({
   alert,
   variants,
   handleSubmit,
-  currSignupStage,
   fields,
   handleFieldChange,
   isSendingRequest = false
@@ -29,21 +28,17 @@ function PhaseOne({
           opacity: { duration: 0.5 },
           transform: { duration: 0.5 }
         }}
-        className={`flex flex-col rounded-b-md bg-white ${
-          currSignupStage === 0 ? 'h-auto' : 'h-0'
-        } w-full max-w-md mx-auto shadow-md ${
-          currSignupStage === 0 ? 'px-8 sm:px-12 pb-12' : 'p-0'
-        }`}
+        className={`flex flex-col rounded-b-md bg-white h-auto
+         w-full max-w-md mx-auto shadow-md px-8 sm:px-12 pb-12 rounded-t-md 
+          }`}
       >
-        <h2 className="mb-4 text-2xl text-center text-gray-500">
-          {fields.scope.value === unitScopes.PIVA
-            ? 'Registrati'
-            : 'Registrati come referente'}
+        <h2 className="mb-4 text-2xl text-center text-gray-500 py-6">
+          Registrati
         </h2>
         {!isObjectEmpty(alert) && <Alert {...alert} className="mb-4" />}
         <form onSubmit={handleSubmit}>
           <div className="space-y-8">
-            <FloatingLabelInput
+            <Input
               label="Nome"
               isRequired={true}
               isInvalid={fields.nome.invalid}
@@ -53,7 +48,7 @@ function PhaseOne({
               onChange={(e) => handleFieldChange('nome', e.target.value)}
               id="nome"
             />
-            <FloatingLabelInput
+            <Input
               label="Cognome"
               isRequired={true}
               isInvalid={fields.cognome.invalid}
@@ -63,7 +58,7 @@ function PhaseOne({
               onChange={(e) => handleFieldChange('cognome', e.target.value)}
               id="cognome"
             />
-            <FloatingLabelInput
+            <Input
               label="Email"
               isRequired={true}
               isInvalid={fields.email.invalid}
@@ -73,7 +68,7 @@ function PhaseOne({
               onChange={(e) => handleFieldChange('email', e.target.value)}
               id="email"
             />
-            <FloatingLabelInput
+            <Input
               label="Telefono"
               isRequired={true}
               isInvalid={fields.phone.invalid}
@@ -84,73 +79,36 @@ function PhaseOne({
               onChange={(e) => handleFieldChange('phone', e.target.value)}
               id="phone"
             />
-            <Infobox>
-              Riceverai un codice via SMS sul tuo telefono per confermare la tua
-              identità
-            </Infobox>
-            <div className="space-y-2">
-              <div
-                className={`${
-                  fields.contractAccepted.invalid &&
-                  'border border-red-100 text-red-900 p-2'
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  name="acceptContract"
-                  className="mr-2 text-gray-500"
-                  onClick={() =>
-                    handleFieldChange(
-                      'contractAccepted',
-                      !fields.contractAccepted.value
-                    )
-                  }
-                  checked={fields.contractAccepted.value}
-                />
-                Accetto i termini e condizioni del{' '}
-                <a
-                  href={`https://toduba-public.s3.eu-south-1.amazonaws.com/Contratto+utenti.html`}
-                  target="_blank"
-                  className="mt-2 text-green-500 hover:underline"
-                >
-                  contratto TODUBA
-                </a>
-              </div>
-              <div
-                className={`${
-                  fields.conditionsAccepted.invalid &&
-                  'border border-red-100 p-2'
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  name="acceptTermsAndConditions"
-                  className="mr-2"
-                  value={fields.conditionsAccepted.value}
-                  onClick={() =>
-                    handleFieldChange(
-                      'conditionsAccepted',
-                      !fields.conditionsAccepted.value
-                    )
-                  }
-                />
-                Ho letto e Acconsento alle{' '}
-                <a
-                  href="https://toduba-public.s3.eu-south-1.amazonaws.com/privacy.html"
-                  target="_blank"
-                  className="mt-2 text-green-600 hover:underline"
-                >
-                  regole di trattamento sulla Privacy.
-                </a>
-              </div>
-            </div>
+            <Input
+              label="Password"
+              isRequired={true}
+              isInvalid={fields.password.invalid}
+              invalidText="Inserire una password valida"
+              type="password"
+              value={fields.password.value}
+              onChange={(e) => handleFieldChange('password', e.target.value)}
+              id="password"
+            />
+
+            <Input
+              label="Ripeti password"
+              isRequired={true}
+              isInvalid={fields.passwordRepeat.invalid}
+              invalidText="Le password sono vuote o non combaciano"
+              type="password"
+              value={fields.passwordRepeat.value}
+              onChange={(e) =>
+                handleFieldChange('passwordRepeat', e.target.value)
+              }
+              id="passwordRepeat"
+            />
             <Button
               type="submit"
               fullWidth={true}
               variant="primary"
               disabled={isSendingRequest}
             >
-              {isSendingRequest ? 'Attendere prego...' : 'Continua'}
+              {isSendingRequest ? 'Attendere prego...' : 'Conferma'}
             </Button>
           </div>
         </form>

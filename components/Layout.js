@@ -21,14 +21,14 @@ const selectCurrUnitIndex = createSelector(
   (currentIndex) => currentIndex
 )
 
-function Layout({ children, title = 'Toduba' }) {
+function Layout({ children, title = 'CePosto' }) {
   const currUnitIndex = useSelector(selectCurrUnitIndex)
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const router = useRouter()
 
-  const unit = useSelector((state) => state?.units?.data?.[currUnitIndex])
+  const user = useSelector((state) => state?.units?.data?.[currUnitIndex])
 
   useEffect(() => {
     if (isMobileMenuOpen) setIsMobileMenuOpen(false)
@@ -49,7 +49,7 @@ function Layout({ children, title = 'Toduba' }) {
       />
 
       <NavLink
-        pathname={`/home`}
+        pathname={`/profile`}
         text={`Profilo`}
       />
     </>

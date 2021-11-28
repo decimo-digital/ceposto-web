@@ -1,5 +1,6 @@
 import React from "react";
 import Icon, { icons } from "./Icon";
+import Link from 'next/link'
 
 export default function Navbar({ fixed }) {
   const [navbarOpen, setNavbarOpen] = React.useState(false);
@@ -10,13 +11,15 @@ export default function Navbar({ fixed }) {
           <div className="w-full relative flex justify-between lg:w-auto lg:static lg:block lg:justify-start">
             <a
               className="text-sm font-bold leading-relaxed inline-block mr-4 py-2 whitespace-nowrap uppercase text-white"
-              href="#pablo"
+              href="/home"
             >
               CePosto
             </a>
 
             <button
-              className="text-white cursor-pointer text-xl leading-none px-3 py-1 border border-solid border-transparent rounded bg-transparent block lg:hidden outline-none focus:outline-none"
+              className={`
+              text-white cursor-pointer text-xl leading-none px-3 py-1 border border-solid border-transparent rounded bg-transparent block lg:hidden outline-none focus:outline-none
+              `}
               type="button"
               onClick={() => setNavbarOpen(!navbarOpen)}
             >
@@ -36,34 +39,38 @@ export default function Navbar({ fixed }) {
           >
             <ul className="flex flex-col lg:flex-row list-none lg:ml-auto">
               <li className="nav-item">
-                <a
-                  className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
-                  href="#pablo"
-                >
-                  <i className="fab fa-pinterest text-lg leading-lg text-white opacity-75"></i>
-                  <span className="ml-2">
-                    {
-                      navbarOpen
-                        ? 'Ristoranti'
-                        : <Icon name={icons.MANUAL} />
-                    }
-                  </span>
-                </a>
+                <Link href={`/home`}>
+                  <a
+                    className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
+                  >
+                    <i className="fab fa-pinterest text-lg leading-lg text-white opacity-75"></i>
+                    <span className="ml-2">
+                      {
+                        navbarOpen
+                          ? 'Ristoranti'
+                          : 'Ristoranti'
+                        //  : <Icon name={icons.MANUAL} />
+                      }
+                    </span>
+                  </a>
+                </Link>
               </li>
               <li className="nav-item">
-                <a
-                  className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
-                  href="#pablo"
-                >
-                  <i className="fab fa-pinterest text-lg leading-lg text-white opacity-75"></i>
-                  <span className="ml-2">
-                    {
-                      navbarOpen
-                        ? 'Profilo'
-                        : <Icon name={icons.USER} />
-                    }
-                  </span>
-                </a>
+                <Link href={`/profile/1`}>
+                  <a
+                    className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
+                  >
+                    <i className="fab fa-pinterest text-lg leading-lg text-white opacity-75"></i>
+                    <span className="ml-2">
+                      {
+                        navbarOpen
+                          ? 'Profilo'
+                          : 'Profilo'
+                        // : <Icon name={icons.USER} />
+                      }
+                    </span>
+                  </a>
+                </Link>
               </li>
             </ul>
           </div>

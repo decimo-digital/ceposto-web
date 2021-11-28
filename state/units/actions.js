@@ -2063,7 +2063,7 @@ const getUnitsOfCurrentUnit = () => {
             profilePic = await readBinaryPhoto(picBlob)
           } else {
             profilePic =
-              'https://toduba-public.s3.eu-south-1.amazonaws.com/default_merchant.png'
+              ''
           }
 
           return { ...unit, profilePic }
