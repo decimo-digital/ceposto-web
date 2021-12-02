@@ -265,7 +265,6 @@ Merchants.getInitialProps = async (context) => {
   }
 
   try {
-    console.log('--->', context.query)
     const urlCurrentMerchant = Number(context.query.id)
     console.log(urlCurrentMerchant)
     const username = reduxStore.getState().auth.username

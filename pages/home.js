@@ -10,42 +10,43 @@ import Input from 'components/Input'
 import { useState, useEffect } from "react"
 import Button from 'components/Button'
 import { userLogout } from 'state/auth/actions'
+import { getMerchants } from 'state/units/actions'
+import { useStore } from 'react-redux'
 
 const Home = (props) => {
   const [filter, setFilter] = useState('')
   const [page, setPage] = useState(1)
-  console.log(props.merchants)
-  const merchants = typeof props.merchants !== 'undefined' && (props.merchants).length > 0
-    ? props.merchants
-    : [
+  const store = useStore()
+  const merchants = store.getState().merchants.merchants
+    ??
+    [
       {
         id: 1,
-        name: 'Da Lillo',
+        storeName: 'Da Lillo',
         description: 'Porcaccia la madonna, avqua a 8€',
         image: 'r1.jpg'
       },
       {
         id: 2,
-        name: 'Pescaria',
+        storeName: 'Pescaria',
         description: 'Mannaggia se è buono il pesce qua',
         image: 'r2.jpg',
       },
       {
         id: 3,
-        name: 'Cannavacciuolo Bistrot',
+        storeName: 'Cannavacciuolo Bistrot',
         description: 'Hai cagato?',
         image: 'r4.jpg'
       },
       {
         id: 4,
-        name: 'La Cadrega',
+        storeName: 'La Cadrega',
         description: 'Mangiare qui è un inganno',
         image: 'cadrega.jpg'
       },
     ]
-
   const pageCount = Number(((merchants.length / 10) + 1).toFixed(0))
-
+  console.log()
   return (
     <>
       <Head>
@@ -193,17 +194,14 @@ Home.getInitialProps = async (context) => {
   try {
     const username = reduxStore.getState().auth.username
     await initStore(reduxStore, token, username)
-    const { data: merchants } = await axiosMerchant.get(
-      `/`,
-      { headers: { 'access-token': token } }
-    )
+    await reduxStore.dispatch(getMerchants())
 
     // return {
     //   token,
     //   merchant,
     //   //initialReduxState: reduxStore.getState()
     // }
-    return { token, merchants }
+    return { token }
   } catch (err) {
     console.error(err)
 

@@ -1,7 +1,32 @@
 import dayjs from 'dayjs'
+import { axiosPrenotation } from 'utils/axiosInstance'
 import Button from './Button'
-const BookCard = ({ id, name, dateOfPrenotation, amount, valid }) => {
-  console.log(dayjs().unix())
+const BookCard = ({ id, name, dateOfPrenotation, amount, valid, merchant, token, onSuccessfullDismiss, onErrorDismiss, openDialog }) => {
+
+  const dismissPrenotation = async () => {
+    const dismissBody = {
+      id,
+      owner: merchant.owner,
+      merchantId: merchant.id,
+      dateOfPrenotation: dateOfPrenotation,
+      date: dateOfPrenotation,
+      amount: amount,
+      enabled: false,
+      valid: false
+    }
+
+    try {
+      await axiosPrenotation.patch(
+        '/', dismissBody,
+        { headers: { 'access-token': token } }
+      )
+      onSuccessfullDismiss(id, name)
+    } catch (error) {
+      console.error(error)
+      onErrorDismiss()
+    }
+  }
+
   return (
     <div className="pt-2 pb-6 ">
       <div id="card" className="">
@@ -33,9 +58,18 @@ const BookCard = ({ id, name, dateOfPrenotation, amount, valid }) => {
             {
               valid && (
                 <div className='grid grid-rows-2'>
-                  <Button variant='primary' noRoundDown={true}>Modifica</Button>
+                  <Button variant='primary'
+                    noRoundDown={true}
+                    onClick={openDialog(merchant)}
+                  >
+                    Modifica
+                  </Button>
 
-                  <Button variant='refuse' noRoundTop={true}>Annulla</Button>
+                  <Button
+                    variant='refuse'
+                    noRoundTop={true}
+                    onClick={dismissPrenotation}
+                  >Annulla</Button>
                 </div>
 
               )

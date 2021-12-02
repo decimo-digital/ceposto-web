@@ -1,13 +1,13 @@
 import { combineReducers } from 'redux'
 
-import unitsReducer from './units/reducer'
+import merchantsReducer from './units/reducer'
 import userReducer from './user/reducer'
 import authReducer from './auth/reducer'
 import currentUnitIndexReducer from './currentUnitIndex/reducer'
 
 const appReducer = combineReducers({
   auth: authReducer,
-  units: unitsReducer,
+  merchants: merchantsReducer,
   currentUnitIndex: currentUnitIndexReducer,
   user: userReducer
 })

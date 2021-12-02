@@ -12,102 +12,116 @@ import Dialog from 'components/Dialog'
 import AlertFloat from 'components/AlertFloat'
 import isObjectEmpty from 'utils/isObjectEmpty'
 import BookCard from 'components/BookCard'
+import { useStore } from 'react-redux'
+import { axiosPrenotation } from 'utils/axiosInstance'
+import InputBook from 'components/InputBook'
 
-const Profile = ({ merchant }) => {
-  const [requestingSeats, setRequestingSeats] = useState(1)
+const Profile = (props) => {
   const [alert, setAlert] = useState(false)
   const [isOpenDialog, setIsOpenDialog] = useState(false)
+  const openDialog = () => {
+    setIsOpenDialog(false)
+  }
+  const closeDialog = () => setIsOpenDialog(false)
+  const store = useStore()
+  const user = store.getState().user
+  const merchants = store.getState().merchants.merchants
+  const [requestingSeats, setRequestingSeats] = useState(0)
+  const [selectedMerchant, setSelectedMerchant] = useState({})
   const [isSendingRequest, setIsSendingRequest] = useState(false)
 
-  const restaurants = [
-    {
-      id: 1,
-      name: 'Da Lillo',
-      description: 'Porcaccia la madonna, avqua a 8€',
-      image: 'r1.jpg'
-    },
-    {
-      id: 2,
-      name: 'Pescaria',
-      description: 'Mannaggia se è buono il pesce qua',
-      image: 'r2.jpg',
-    },
-    {
-      id: 3,
-      name: 'Cannavacciuolo Bistrot',
-      description: 'Hai cagato?',
-      image: 'r4.jpg'
-    },
-    {
-      id: 4,
-      name: 'La Cadrega',
-      description: 'Mangiare qui è un inganno',
-      image: 'cadrega.jpg'
-    }
-  ]
 
   const prenotations =
-    [
-      {
-        id: 10,
-        owner: 1,
-        merchantId: 4,
-        dateOfPrenotation: 1637785265448,
-        amount: 5,
-        valid: false
-      },
-      {
-        id: 11,
-        owner: 12,
-        merchantId: 4,
-        dateOfPrenotation: 1637785265448,
-        amount: 5,
-        valid: false
-      },
-      {
-        id: 12,
-        owner: 1,
-        merchantId: 2,
-        dateOfPrenotation: 1637785265448,
-        amount: 15,
-        valid: true
-      },
-      {
-        id: 13,
-        owner: 1,
-        merchantId: 2,
-        dateOfPrenotation: 1637785265448,
-        amount: 15,
-        valid: false
-      },
-      {
-        id: 14,
-        owner: 1,
-        merchantId: 2,
-        dateOfPrenotation: 1637785265448,
-        amount: 15,
-        valid: false
-      },
-      {
-        id: 15,
-        owner: 1,
-        merchantId: 2,
-        dateOfPrenotation: 1637785265448,
-        amount: 15,
-        valid: true
-      },
-
-    ]
-
-  const user = {
-    id: 1,
-    firstName: 'Marco',
-    lastName: 'Luddeni',
-    email: 'luddenimarco@gmail.com',
-    phone: '+390000000000',
-  }
+    typeof props.prenotations !== 'undefined'
+      ? props.prenotations
+      : []
 
   const today = dayjs().format('DD/MM/YYYY')
+
+  async function onSuccessfullDismiss(id, name) {
+    prenotations.map(
+      prenotation => {
+        if (prenotation.id === id) {
+          prenotation.valid = false
+          prenotation.enabled = false
+        }
+      }
+    )
+
+    setAlert({
+      type: 'success',
+      title: 'Annullamento effettuato con successo',
+      body: `La prenotazione da ${name} è stata annullata`,
+      animate: true
+    })
+  }
+
+  async function onErrorDismiss(name, id) {
+    setAlert({
+      type: 'error',
+      title: 'Qualcosa è andato storto',
+      body: 'Riprova tra qualche minuto',
+      animate: true
+    })
+  }
+
+  const modifyPrenotation = async () => {
+    console.log('Modifico prenotazione...')
+    setIsSendingRequest(true)
+    const patchBody = {
+      id: selectedMerchant.id,
+      owner: selectedMerchant.owner,
+      merchantId: selectedMerchant.id,
+      dateOfPrenotation: selectedMerchant.dateOfPrenotation,
+      date: selectedMerchant.dateOfPrenotation,
+      amount: requestingSeats,
+      enabled: true,
+      valid: true
+    }
+    try {
+      await axiosPrenotation.patch(
+        '/', patchBody,
+        { headers: { 'access-token': props.token } }
+      )
+
+      setAlert({
+        type: 'success',
+        title: `Modifica avvenuta con successo`,
+        body: ` `
+
+      })
+      setIsSendingRequest(false)
+      setIsOpenDialog(false)
+    } catch (error) {
+      console.log(error)
+      setIsOpenDialog(false)
+      setIsSendingRequest(false)
+      setAlert({
+        type: 'error',
+        title: 'Errore',
+        body: 'Ci dispiace, qualcosa è andato storto'
+      })
+    }
+  }
+
+  function handleRequestingSeatsChange(type) {
+    switch (type) {
+      case 'plus':
+        setRequestingSeats(requestingSeats => requestingSeats += 1)
+        break
+      case 'minus':
+        if (requestingSeats - 1 > 0)
+          setRequestingSeats(requestingSeats => requestingSeats -= 1)
+
+        break
+      default:
+        console.log('No good')
+    }
+  }
+
+  useEffect(() => {
+    console.log(isOpenDialog)
+  }, [isOpenDialog])
 
   return (
     <>
@@ -146,13 +160,20 @@ const Profile = ({ merchant }) => {
                           <BookCard
                             id={book.id}
                             name={
-                              restaurants.filter(
-                                rs => rs.id === book.merchantId
-                              )[0].name
+                              merchants.filter(
+                                merchant => merchant.id === book.merchantId
+                              )[0].storeName
                             }
                             dateOfPrenotation={book.dateOfPrenotation}
                             amount={book.amount}
                             valid={book.valid}
+                            merchant={merchants.filter(
+                              merchant => merchant.id === book.merchantId
+                            )[0]}
+                            token={props.token}
+                            onSuccessfullDismiss={onSuccessfullDismiss}
+                            onErrorDismiss={onErrorDismiss}
+                            openDialog={openDialog}
                           />
                         )
                       }
@@ -163,6 +184,59 @@ const Profile = ({ merchant }) => {
           </div>
         </div>
       </div>
+      <Dialog
+        isOpen={isOpenDialog}
+        handleDismiss={() => { setIsOpenDialog(false) }}
+      >
+        <div className="mt-4 space-y-8">
+          <h2 className='font-medium text-2xl text-gray-500'>
+            Modifica prenotazione
+          </h2>
+          <span>Seleziona il numero di posti:</span>
+          <div className='grid grid-cols-3'>
+
+            <Button
+              onClick={() => handleRequestingSeatsChange('minus')}
+              className='border border-2 border-red-200 rounded' >
+              <p className='text-6xl'>-</p>
+            </Button>
+
+            <div className='flex items-center'>
+              <div className='w-1/2 mx-auto'>
+                <InputBook
+                  isRequired={false}
+                  value={requestingSeats}
+                  onChange={(e) => {
+                    if (Number(e.target.value) <= selectedMerchant.freeSeats
+                      && Number(e.target.value > 0))
+                      setRequestingSeats(Number(e.target.value))
+                  }}
+                />
+              </div>
+            </div>
+
+            <Button
+              onClick={() => handleRequestingSeatsChange('plus')}
+              disabled={Number(selectedMerchant.freeSeats) - Number(requestingSeats) < 1}
+              className='border border-2 border-green-200 rounded'
+            >
+              <p className='text-6xl'>+</p>
+            </Button>
+
+          </div>
+
+          <div className='mx-auto text-right'>
+            <Button
+              variant='primary'
+              onClick={modifyPrenotation}
+            >
+              Conferma
+            </Button>
+          </div>
+
+        </div>
+
+      </Dialog>
     </>
   )
 }
@@ -171,37 +245,31 @@ Profile.getInitialProps = async (context) => {
   const { res } = context
   const reduxStore = initializeStore()
   let { token } = nextCookie(context)
-  // try {
-  //   token = checkToken({
-  //     tokenFromStorage: token,
-  //     tokenInQueryString: context.query.token
-  //   })
-  // } catch (err) {
-  //   if (typeof window !== 'undefined') Router.push('/')
-  //   else {
-  //     res.writeHead(302, {Location: '/' })
-  //     res.end()
-  //   }
-  // }
+  try {
+    token = checkToken({
+      tokenFromStorage: token,
+      tokenInQueryString: context.query.token
+    })
+  } catch (err) {
+    if (typeof window !== 'undefined') Router.push('/')
+    else {
+      res.writeHead(302, { Location: '/' })
+      res.end()
+    }
+  }
 
   try {
-    const urlCurrentMerchant = Number(context.query.id)
 
-    //await initStore(reduxStore, token, urlCurrentUnitIndex)
+    const username = reduxStore.getState().auth.username
+    await initStore(reduxStore, token, username)
+    const idCurrentUser = reduxStore.getState().user.id
 
-    // const merchant = await axiosRes.get(
-    //   `/${urlCurrentMerchant}`,
-    //   { headers: { 'x-access-token': token } }
-    // )
+    const { data: prenotations } = await axiosPrenotation.get(
+      `?userId=${idCurrentUser}`,
+      { headers: { 'access-token': token } }
+    )
 
-
-    // return {
-    //   token,
-    //    merchant,
-    //   initialReduxState: reduxStore.getState()
-    // }
-
-    return {}
+    return { prenotations, token }
   } catch (err) {
     console.error(err)
 

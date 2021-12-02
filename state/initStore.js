@@ -4,7 +4,8 @@ import {
   getUnitsEmployees,
   getUnitsPendingEmployees,
   getUnitContract,
-  getUnitsContracts
+  getUnitsContracts,
+  getMerchants
 } from './units/actions'
 
 import { userLogin, userLogout } from './auth/actions'
@@ -20,6 +21,10 @@ async function initStore(store, token = '', username) {
     if (isObjectEmpty(store.getState().user)) {
       const email = store.getState().auth.username
       await store.dispatch(getUserByEmail(email))
+    }
+
+    if (isObjectEmpty(store.getState().merchants)) {
+      await store.dispatch(getMerchants())
     }
 
   } catch (err) {
