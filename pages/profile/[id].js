@@ -19,17 +19,26 @@ import InputBook from 'components/InputBook'
 const Profile = (props) => {
   const [alert, setAlert] = useState(false)
   const [isOpenDialog, setIsOpenDialog] = useState(false)
-  const openDialog = () => {
-    setIsOpenDialog(false)
-  }
+  // const openDialog = () => {
+  //   setIsOpenDialog(true)
+  // }
   const closeDialog = () => setIsOpenDialog(false)
   const store = useStore()
   const user = store.getState().user
   const merchants = store.getState().merchants.merchants
-  const [requestingSeats, setRequestingSeats] = useState(0)
+  const [requestingSeats, setRequestingSeats] = useState(1)
   const [selectedMerchant, setSelectedMerchant] = useState({})
   const [isSendingRequest, setIsSendingRequest] = useState(false)
+  const openUpdate = (merchant) => {
+    setSelectedMerchant(merchant)
+    setIsOpenDialog(true)
 
+  }
+
+  useEffect(() => {
+    console.log(selectedMerchant)
+    setRequestingSeats(selectedMerchant.amount)
+  }, [selectedMerchant])
 
   const prenotations =
     typeof props.prenotations !== 'undefined'
@@ -150,8 +159,9 @@ const Profile = (props) => {
               <h2 className='text-center text-3xl'>Le mie prenotazioni</h2>
               <p className={`w-1/2 text-left mx-auto rounded border-6 border-gray-400
                p-3`}>
-                {
-                  prenotations
+                {prenotations
+                  .filter(book => book.owner === user.id).length > 0
+                  ? prenotations
                     .filter(book => book.owner === user.id)
                     .sort((a, b) => a.valid < b.valid)
                     .map(
@@ -173,11 +183,12 @@ const Profile = (props) => {
                             token={props.token}
                             onSuccessfullDismiss={onSuccessfullDismiss}
                             onErrorDismiss={onErrorDismiss}
-                            openDialog={openDialog}
+                            setisopen={openUpdate}
                           />
                         )
                       }
                     )
+                  : 'Non sono presenti prenotazioni.'
                 }
               </p>
             </div>

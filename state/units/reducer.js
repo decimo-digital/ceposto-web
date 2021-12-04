@@ -1,5 +1,6 @@
 import {
   GET_MERCHANTS,
+  UPDATE_MERCHANT_FREE_SEATS,
 } from './actions'
 
 
@@ -7,8 +8,19 @@ const merchantsReducer = (state = {}, action) => {
   const { type, payload } = action
   switch (type) {
     case GET_MERCHANTS:
-
       return { ...state, merchants: payload.merchants }
+    case UPDATE_MERCHANT_FREE_SEATS:
+      return {
+        ...state,
+        merchants: state.merchants.map(
+          merchant =>
+            merchant.id === payload.merchantId
+              ? {
+                ...merchant, freeSeats: payload.updatedFreeSeats
+              }
+              : merchant
+        )
+      }
     // case UPDATE_UNIT:
     //   return {
     //     ...state,

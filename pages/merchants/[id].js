@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import nextCookie from 'next-cookies'
 import { initializeStore } from 'state/store'
 import { Router } from 'next/router'
@@ -17,8 +17,10 @@ import { axiosMerchant, axiosPrenotation } from 'utils/axiosInstance'
 import Infobox from 'components/Infobox'
 import InputBook from 'components/InputBook'
 import MerchantCard from 'components/MerchantCard'
+import { updateMerchantFreeSeats } from 'state/units/actions'
 
 const Merchants = (props) => {
+  const dispatch = useDispatch()
   const [requestingSeats, setRequestingSeats] = useState(1)
   const [alert, setAlert] = useState(false)
   const [isOpenDialog, setIsOpenDialog] = useState(false)
@@ -48,6 +50,14 @@ const Merchants = (props) => {
           requesterId: user.id
         }
       )
+      await dispatch(
+        updateMerchantFreeSeats({
+          merchantId: currentMerchant.id,
+          updatedFreeSeats:
+            currentMerchant.freeSeats - requestingSeats
+        })
+      )
+      props.merchant.freeSeats = currentMerchant.freeSeats - requestingSeats
       setAlert({
         type: 'success',
         title: ` ${currentMerchant.storeName} ti aspetta!`,
@@ -55,6 +65,7 @@ const Merchants = (props) => {
 
       })
       setIsSendingRequest(false)
+      setRequestingSeats(1)
       setIsOpenDialog(false)
     } catch (error) {
       console.log(error)

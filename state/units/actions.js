@@ -15,6 +15,7 @@ import decamelizeObject from 'utils/decamelizeObject'
 
 // Merchants
 const GET_MERCHANTS = 'GET_MERCHANTS'
+const UPDATE_MERCHANT_FREE_SEATS = 'UPDATE_MERCHANT_FREE_SEATS'
 
 /* Actions */
 
@@ -28,6 +29,7 @@ const getMerchants = () => {
       `/`,
       { headers: { 'access-token': token } }
     )
+    console.log(merchants)
     dispatch({
       type: 'GET_MERCHANTS',
       payload: { merchants }
@@ -35,8 +37,30 @@ const getMerchants = () => {
   }
 }
 
+const updateMerchantFreeSeats = ({ merchantId, updatedFreeSeats }) => {
+  console.log('\nupdateMerchantFreeSeats')
+  console.log(merchantId, updatedFreeSeats)
+  return async (dispatch, getState) => {
+    const { token } = getState().auth
+
+    await axiosMerchant.patch(
+      `/${merchantId}`, {
+      freeSeats: updatedFreeSeats
+    },
+      { headers: { 'access-token': token } }
+    )
+
+    dispatch({
+      type: 'UPDATE_MERCHANT_FREE_SEATS',
+      payload: { merchantId, updatedFreeSeats }
+    })
+  }
+}
+
 
 export {
   GET_MERCHANTS,
-  getMerchants
+  UPDATE_MERCHANT_FREE_SEATS,
+  getMerchants,
+  updateMerchantFreeSeats
 }

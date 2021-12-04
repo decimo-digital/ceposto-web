@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { axiosPrenotation } from 'utils/axiosInstance'
 import Button from './Button'
-const BookCard = ({ id, name, dateOfPrenotation, amount, valid, merchant, token, onSuccessfullDismiss, onErrorDismiss, openDialog }) => {
+const BookCard = ({ id, name, dateOfPrenotation, amount, valid, merchant, token, onSuccessfullDismiss, onErrorDismiss, setisopen }) => {
 
   const dismissPrenotation = async () => {
     const dismissBody = {
@@ -60,7 +60,7 @@ const BookCard = ({ id, name, dateOfPrenotation, amount, valid, merchant, token,
                 <div className='grid grid-rows-2'>
                   <Button variant='primary'
                     noRoundDown={true}
-                    onClick={openDialog(merchant)}
+                    onClick={() => { setisopen({ ...merchant, amount }) }}
                   >
                     Modifica
                   </Button>
