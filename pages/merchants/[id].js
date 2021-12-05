@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import nextCookie from 'next-cookies'
 import { initializeStore } from 'state/store'
-import { Router } from 'next/router'
+import Router from 'next/router'
 import { checkToken } from 'utils/checkToken'
 import initStore from 'state/initStore'
 import { userLogout } from 'state/auth/actions'
@@ -27,7 +27,6 @@ const Merchants = (props) => {
   const [isSendingRequest, setIsSendingRequest] = useState(false)
 
   const user = useSelector(state => state.user)
-  console.log(user)
 
   const sendPrenotationRequest = async () => {
     console.log('Invio prenotazione...')
@@ -42,14 +41,14 @@ const Merchants = (props) => {
       },
         { headers: { 'access-token': props.token } }
       )
-      console.log(response,
-        {
-          merchantId: currentMerchant.id,
-          seatsAmount: requestingSeats,
-          date: dayjs(),
-          requesterId: user.id
-        }
-      )
+      // console.log(response,
+      //   {
+      //     merchantId: currentMerchant.id,
+      //     seatsAmount: requestingSeats,
+      //     date: dayjs(),
+      //     requesterId: user.id
+      //   }
+      // )
       await dispatch(
         updateMerchantFreeSeats({
           merchantId: currentMerchant.id,
@@ -68,7 +67,7 @@ const Merchants = (props) => {
       setRequestingSeats(1)
       setIsOpenDialog(false)
     } catch (error) {
-      console.log(error)
+      console.error(error)
       setIsSendingRequest(false)
       setAlert({
         type: 'error',
@@ -277,26 +276,19 @@ Merchants.getInitialProps = async (context) => {
 
   try {
     const urlCurrentMerchant = Number(context.query.id)
-    console.log(urlCurrentMerchant)
     const username = reduxStore.getState().auth.username
     await initStore(reduxStore, token, username)
-
-    console.log(urlCurrentMerchant, username)
 
     const { data: merchant } = await axiosMerchant.get(
       `/${urlCurrentMerchant}/data`,
       { headers: { 'access-token': token } }
     )
 
-
-
-    // return {
-    //   token,
-    //    merchant,
-    //   initialReduxState: reduxStore.getState()
-    // }
-
-    return { token, merchant }
+    return {
+      token,
+      merchant,
+      initialReduxState: reduxStore.getState()
+    }
   } catch (err) {
     console.error(err)
 

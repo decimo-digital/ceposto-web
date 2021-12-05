@@ -5,7 +5,7 @@ const authReducer = (state = {}, action) => {
     case USER_LOGIN:
       return Object.assign({}, state, { ...action.payload })
     case USER_LOGOUT:
-      return state
+      return {}
     default:
       return state
   }

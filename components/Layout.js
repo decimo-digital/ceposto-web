@@ -37,7 +37,7 @@ function Layout({ children, title = 'CePosto' }) {
   const links = (
     <>
       <NavLink
-        pathname={`/home`}
+        pathname={`/`}
         text={`CePosto`}
       />
 

@@ -1,14 +1,13 @@
 import cookie from 'js-cookie'
 import { axiosAuth } from '../../utils/axiosInstance'
 import isObjectEmpty from '../../utils/isObjectEmpty'
-
+import Router from 'next/router'
 // Action types
 const USER_LOGIN = 'USER_LOGIN'
 const USER_LOGOUT = 'USER_LOGOUT'
 
 // Actions
 const userLogin = (token, email) => {
-  console.log('userLogin ', token)
   return async function login(dispatch, getState) {
     let options = {
       expires: 0.25, // six hours

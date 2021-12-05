@@ -12,6 +12,7 @@ import Button from 'components/Button'
 import { userLogout } from 'state/auth/actions'
 import { getMerchants } from 'state/units/actions'
 import { useStore } from 'react-redux'
+import Router from 'next/router'
 
 const Home = (props) => {
   const [filter, setFilter] = useState('')
@@ -46,7 +47,6 @@ const Home = (props) => {
       },
     ]
   const pageCount = Number(((merchants.length / 10) + 1).toFixed(0))
-  console.log()
   return (
     <>
       <Head>
@@ -176,7 +176,6 @@ Home.getInitialProps = async (context) => {
   const { res } = context
   const reduxStore = initializeStore()
   let { token } = nextCookie(context)
-  console.log('-->', token)
 
   try {
     token = checkToken({
@@ -201,7 +200,10 @@ Home.getInitialProps = async (context) => {
     //   merchant,
     //   //initialReduxState: reduxStore.getState()
     // }
-    return { token }
+    return {
+      token,
+      initialReduxState: reduxStore.getState()
+    }
   } catch (err) {
     console.error(err)
 

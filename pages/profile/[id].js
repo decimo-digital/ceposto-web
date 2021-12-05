@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import nextCookie from 'next-cookies'
 import { initializeStore } from 'state/store'
-import { Router } from 'next/router'
+import { useRouter } from 'next/router'
+import Router from 'next/router'
 import { checkToken } from 'utils/checkToken'
 import initStore from 'state/initStore'
 import { userLogout } from 'state/auth/actions'
@@ -12,11 +13,13 @@ import Dialog from 'components/Dialog'
 import AlertFloat from 'components/AlertFloat'
 import isObjectEmpty from 'utils/isObjectEmpty'
 import BookCard from 'components/BookCard'
-import { useStore } from 'react-redux'
+import { useStore, useDispatch } from 'react-redux'
 import { axiosPrenotation } from 'utils/axiosInstance'
 import InputBook from 'components/InputBook'
 
 const Profile = (props) => {
+  const dispatch = useDispatch()
+  const router = useRouter()
   const [alert, setAlert] = useState(false)
   const [isOpenDialog, setIsOpenDialog] = useState(false)
   // const openDialog = () => {
@@ -72,6 +75,12 @@ const Profile = (props) => {
       body: 'Riprova tra qualche minuto',
       animate: true
     })
+  }
+
+  function handleLogout(e) {
+    e.preventDefault()
+    dispatch(userLogout())
+    router.push('/')
   }
 
   const modifyPrenotation = async () => {
@@ -146,14 +155,22 @@ const Profile = (props) => {
 
             <div id='info' className='w-full text-center'>
               <h2 className='text-center text-3xl'>Info personali</h2>
+              <div className='p-3'>
+                <Button
+                  variant='primary'
+                  onClick={handleLogout}
+                >ESCI
+                </Button>
+              </div>
+
               <p className={`w-1/2 text-left mx-auto rounded border-6 border-gray-400
                p-3`}>
                 Nome: {user.firstName}<br />
                 Cognome: {user.lastName}<br />
                 Telefono: {user.phone} <br />
                 Email: {user.email} <br />
-
               </p>
+
             </div>
             <div id='books' className='w-full text-center'>
               <h2 className='text-center text-3xl'>Le mie prenotazioni</h2>
@@ -268,32 +285,41 @@ Profile.getInitialProps = async (context) => {
       res.end()
     }
   }
+  if (typeof token !== 'undefined' && token !== '')
+    try {
+      const username = reduxStore.getState().auth.username
+      await initStore(reduxStore, token, username)
+      const idCurrentUser = reduxStore.getState().user.id
 
-  try {
+      const { data: prenotations } = await axiosPrenotation.get(
+        `?userId=${idCurrentUser}`,
+        { headers: { 'access-token': token } }
+      )
 
-    const username = reduxStore.getState().auth.username
-    await initStore(reduxStore, token, username)
-    const idCurrentUser = reduxStore.getState().user.id
+      return {
+        prenotations,
+        token,
+        initialReduxState: reduxStore.getState()
+      }
+    } catch (err) {
+      console.error(err)
 
-    const { data: prenotations } = await axiosPrenotation.get(
-      `?userId=${idCurrentUser}`,
-      { headers: { 'access-token': token } }
-    )
+      if (err?.response?.status === 401) {
+        reduxStore.dispatch(userLogout())
 
-    return { prenotations, token }
-  } catch (err) {
-    console.error(err)
+        if (typeof window !== 'undefined') Router.push('/')
+        else {
+          res.writeHead(302, { Location: '/' })
+          res.end()
+        }
+      }
 
-    if (err?.response?.status === 401) {
-      reduxStore.dispatch(userLogout())
-
-      if (typeof window !== 'undefined') Router.push('/')
-      else {
-        res.writeHead(302, { Location: '/' })
-        res.end()
+      return {
+        notFound: true
       }
     }
-
+  else {
+    Router.push('/')
     return {
       notFound: true
     }

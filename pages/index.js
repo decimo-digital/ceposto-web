@@ -199,8 +199,8 @@ Index.getInitialProps = async (ctx) => {
       let redirectPage = ''
       let redirectPageAs = ''
 
-      redirectPage = '/home'
-      redirectPageAs = '/home'
+      redirectPage = '/'
+      redirectPageAs = '/'
 
       if (typeof window !== 'undefined') {
         Router.push(redirectPage, redirectPageAs)

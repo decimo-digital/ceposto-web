@@ -14,7 +14,7 @@ const MerchantCard = ({ id, name, description, image, type }) => {
                                          bg-gray-300 rounded-lg shadow-xl  mt-4 w-100 mx-2">
 
                   <div className="h-64 w-auto md:w-1/2">
-                    <img className="inset-0 h-full w-full object-cover object-center" src={`${image}`} />
+                    <img className="inset-0 h-full w-full object-cover object-center" src={`../public/sample-1.jpg`} />
                   </div>
 
                   <div className="w-full py-4 px-6 text-gray-800 flex flex-col justify-between">
