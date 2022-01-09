@@ -17,7 +17,7 @@ import { useStore, useDispatch } from 'react-redux'
 import { axiosPrenotation } from 'utils/axiosInstance'
 import InputBook from 'components/InputBook'
 
-const Profile = (props) => {
+const Manage = (props) => {
   const dispatch = useDispatch()
   const router = useRouter()
   const [alert, setAlert] = useState(false)
@@ -153,19 +153,13 @@ const Profile = (props) => {
           <div className="container w-100 lg:w-4/5 mx-auto flex flex-col space-y-4">
 
             <div id='info' className='w-full text-center'>
-              <h2 className='text-center text-3xl'>Info personali</h2>
-              <div className='p-3'>
-                <Button
-                  variant='primary'
-                  onClick={handleLogout}
-                >ESCI
-                </Button>
-              </div>
+              <h2 className='text-center text-3xl'>I miei ristoranti</h2>
 
               <p className={`w-1/2 text-left mx-auto rounded border-6 border-gray-400
                p-3`}>
                 Nome: {user.firstName}<br />
                 Cognome: {user.lastName}<br />
+                Telefono: {user.phone} <br />
                 Email: {user.email} <br />
               </p>
 
@@ -267,7 +261,7 @@ const Profile = (props) => {
   )
 }
 
-Profile.getInitialProps = async (context) => {
+Manage.getInitialProps = async (context) => {
   const { res } = context
   const reduxStore = initializeStore()
   let { token } = nextCookie(context)
@@ -324,4 +318,4 @@ Profile.getInitialProps = async (context) => {
   }
 }
 
-export default Profile
+export default Manage

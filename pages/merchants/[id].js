@@ -29,26 +29,26 @@ const Merchants = (props) => {
   const user = useSelector(state => state.user)
 
   const sendPrenotationRequest = async () => {
-    console.log('Invio prenotazione...')
+    console.log('Invio prenotazione...', dayjs().unix())
     setIsSendingRequest(true)
     try {
       const response = await axiosPrenotation.post(
         '/', {
         merchantId: currentMerchant.id,
         seatsAmount: requestingSeats,
-        date: dayjs(),
+        date: dayjs().valueOf(),
         requesterId: user.id
       },
         { headers: { 'access-token': props.token } }
       )
-      // console.log(response,
-      //   {
-      //     merchantId: currentMerchant.id,
-      //     seatsAmount: requestingSeats,
-      //     date: dayjs(),
-      //     requesterId: user.id
-      //   }
-      // )
+      console.log(response,
+        {
+          merchantId: currentMerchant.id,
+          seatsAmount: requestingSeats,
+          date: dayjs().valueOf(),
+          requesterId: user.id
+        }
+      )
       await dispatch(
         updateMerchantFreeSeats({
           merchantId: currentMerchant.id,

@@ -87,34 +87,32 @@ const Home = (props) => {
                 </div>
               )
           }
+          <div className='grid grid-cols-2 gap-x-0'>
+            {
+              merchants
+                .filter(merchant =>
+                  ((merchant.storeName).toLowerCase()).includes(filter))
+                .slice((page - 1) * 10, (page - 1) * 10 + 10)
+                .map(
+                  merchant => {
+                    const {
+                      id,
+                      storeName,
+                    } = merchant
+                    return (
+                      <MerchantCard
+                        id={id}
+                        name={storeName}
+                        description={''}
+                        image={''}
+                        type={'full'} />
+                    )
+                  }
+                )
+            }
+          </div>
 
-          {
-            merchants
-              .filter(merchant =>
-                ((merchant.storeName).toLowerCase()).includes(filter))
-              .slice((page - 1) * 10, (page - 1) * 10 + 10)
-              .map(
-                merchant => {
-                  const {
-                    id,
-                    distance,
-                    freeSeats,
-                    totalSeats,
-                    storeName,
-                    owner,
-                    point
-                  } = merchant
-                  return (
-                    <MerchantCard
-                      id={id}
-                      name={storeName}
-                      description={''}
-                      image={''}
-                      type={'full'} />
-                  )
-                }
-              )
-          }
+
           {
             merchants
               .filter(merchant =>
@@ -128,7 +126,6 @@ const Home = (props) => {
                     <Button
                       onClick={() => {
                         if (page > 1) {
-                          window.scrollTo({ top: 0, behavior: 'smooth' })
                           setPage(page => page -= 1)
                         }
                       }}>
@@ -139,7 +136,7 @@ const Home = (props) => {
                     </Button>
                     <Button>
                       <div className="flex flex-col md:flex-row overflow-hidden h-12
-                                             bg-gray-300 rounded-lg shadow-xl  mt-4 w-100 mx-2">
+                                             bg-gray-300 rounded-lg shadow-xl  mt-4 w-100 mx-2 cursor-normal">
                         <p className='self-center mx-auto uppercase'>{page}</p>
                       </div>
                     </Button>

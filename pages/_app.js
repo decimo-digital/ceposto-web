@@ -2,7 +2,9 @@ import React, { useEffect } from 'react'
 
 // Redux imports
 import { useStore } from 'state/store'
-import { Provider } from 'react-redux'
+import { Provider as ReduxProvider } from 'react-redux'
+
+import { SessionProvider } from 'next-auth/react'
 
 // Nextjs imports
 import Router from 'next/router'
@@ -45,16 +47,24 @@ export default function App({ Component, pageProps, router }) {
       <Head>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-
-      <Provider store={store}>
+      <ReduxProvider store={store}>
         {hasLoggedIn ? (
           <Layout>
-            <Component {...pageProps} key={router.route} />
+            <SessionProvider
+              session={pageProps.session}
+            >
+              <Component {...pageProps} key={router.route} />
+            </SessionProvider>
+
           </Layout>
         ) : (
-          <Component {...pageProps} />
+          <SessionProvider
+            session={pageProps.session}
+          >
+            <Component {...pageProps} />
+          </SessionProvider>
         )}
-      </Provider>
+      </ReduxProvider>
     </>
   )
 }

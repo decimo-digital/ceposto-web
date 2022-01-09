@@ -45,6 +45,11 @@ function Layout({ children, title = 'CePosto' }) {
         pathname={`/profile/${user.id}`}
         text={`Profilo`}
       />
+
+      <NavLink
+        pathname={`/manage/${user.id}`}
+        text={`Ristoranti`}
+      />
     </>
   )
 
