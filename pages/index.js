@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Router, { useRouter } from 'next/router'
 import nextCookie from 'next-cookies'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
 import Alert from 'components/Alert'
@@ -18,14 +18,28 @@ import { axiosAuth } from 'utils/axiosInstance'
 
 import { userLogin, userLogout } from 'state/auth/actions'
 
-import { signIn, signOut, useSession, getCsrfToken, getSession } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import { getToken } from 'next-auth/jwt'
 
 const Index = () => {
   const [alert, setAlert] = useState({})
   const [isLoggingIn, setIsLoggingIn] = useState(false)
 
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
+
+
+  useEffect(async () => {
+    const checkGoogleToken = async () => {
+      if (typeof session !== 'undefined' && session !== null && status === 'authenticated') {
+        await Promise.all([
+          dispatch(userLogin(session.accessToken, session.user.email)),
+          router.push('/home')
+        ])
+      }
+
+    }
+    await checkGoogleToken()
+  }, [session, status])
 
 
   const [fields, setFields] = useState({
@@ -35,9 +49,8 @@ const Index = () => {
 
   const dispatch = useDispatch()
 
-  const router = useRouter()
 
-  const { registrationEnded, passwordRecovered } = router.query
+  const router = useRouter()
 
   async function handleLogin(e) {
     e.preventDefault()
@@ -55,7 +68,6 @@ const Index = () => {
       }
 
       try {
-        //console.log(data)
         const response = await axiosAuth.post('/login', data)
 
         const { accessToken } = response.data
@@ -202,10 +214,7 @@ const Index = () => {
         </Button> */}
         <Button
           onClick={async () => {
-            // const response = await axiosAuth.post('/google', "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..y6JxOZ-8dKMVS9eC.p-mwKD2RmzkU38wMgXbqxqRxyvLj0RqDL-SRzTP9L1OYInchTEz8K03YFd0uOvQ-4plsZqtA8lfmxl2nClwPCVZxvYDFmD6jx1Xo2aX_L4kKTu3wF8jZmr0aSbM3XlaheS0f7ahap1ezU3wDahiKitWyXRd8THe8ziADR3ga_6Op2VSLaywLIawx79fu69vIYgxxa3Z_wpC_oMn8Oz0PUj9UbGsxjBqA3msTbySF4Z9ef0lbDgGIdj7SBkwKJDXL6WOEPopTkkvVj9mRYqE-jWIGEG3nxtaCDFUBPUzUDVmdR_qvNZLdvrDetvJnqGQcxazgek0A7PWvs3EFOJlQ0NOUNTVYDy9Zo9Apkg.ZcDXglWnm65KhPfEJGRkSQ")
-            // console.log(response)
-            await signIn("google", { redirect: false })
-
+            const x = await signIn("google", { redirect: false })
           }}
         >
           googleAuth
@@ -218,8 +227,6 @@ const Index = () => {
 Index.getInitialProps = async (ctx) => {
   const { token } = nextCookie(ctx)
   const { reduxStore, res } = ctx
-
-
 
   if (typeof token !== 'undefined') {
     try {

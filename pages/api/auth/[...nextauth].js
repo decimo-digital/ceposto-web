@@ -1,6 +1,8 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from "next-auth/providers/google";
 import { axiosAuth } from 'utils/axiosInstance';
+import cookie from 'js-cookie'
+import { addGoogleToken } from 'utils/addGoogleToken';
 
 const options = {
   // Configure one or more authentication providers
@@ -30,15 +32,17 @@ const options = {
   callbacks: {
     // jwt: async (token, user, account, profile, isNewUser) => { return Promise.resolve(token) }
     jwt: async ({ token, user, account, profile, isNewUser }) => {
-      const { data: x } = await axiosAuth.post('/google', { token: account.id_token })
-      console.log(x)
-
-      const isSignIn = (user) ? true : false
-      // Add auth_time to token on signin in
-      if (isSignIn) { token.custom = 'abc' }
+      if (typeof account !== 'undefined') {
+        const { data: x } = await axiosAuth.post('/google', { token: account.id_token })
+        token.accessToken = x.accessToken
+      }
       return Promise.resolve(token)
     },
 
+    session: async ({ session, token, user }) => {
+      session.accessToken = token.accessToken
+      return session;
+    },
   },
   events: {},
 }

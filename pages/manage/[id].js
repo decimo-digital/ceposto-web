@@ -19,131 +19,11 @@ import InputBook from 'components/InputBook'
 
 const Manage = (props) => {
   const dispatch = useDispatch()
-  const router = useRouter()
-  const [alert, setAlert] = useState(false)
-  const [isOpenDialog, setIsOpenDialog] = useState(false)
-  // const openDialog = () => {
-  //   setIsOpenDialog(true)
-  // }
-  const closeDialog = () => setIsOpenDialog(false)
-  const store = useStore()
-  const user = store.getState().user
-  const merchants = store.getState().merchants.merchants
-  const [requestingSeats, setRequestingSeats] = useState(1)
-  const [selectedMerchant, setSelectedMerchant] = useState({})
-  const [isSendingRequest, setIsSendingRequest] = useState(false)
-  const openUpdate = (merchant) => {
-    setSelectedMerchant(merchant)
-    setIsOpenDialog(true)
-
-  }
-
-  useEffect(() => {
-    console.log(selectedMerchant)
-    setRequestingSeats(selectedMerchant.amount)
-  }, [selectedMerchant])
-
-  const prenotations =
-    typeof props.prenotations !== 'undefined'
-      ? props.prenotations
-      : []
-
-  const today = dayjs().format('DD/MM/YYYY')
-
-  async function onSuccessfullDismiss(id, name) {
-    prenotations.map(
-      prenotation => {
-        if (prenotation.id === id) {
-          prenotation.valid = false
-          prenotation.enabled = false
-        }
-      }
-    )
-
-    setAlert({
-      type: 'success',
-      title: 'Annullamento effettuato con successo',
-      body: `La prenotazione da ${name} è stata annullata`,
-      animate: true
-    })
-  }
-
-  async function onErrorDismiss(name, id) {
-    setAlert({
-      type: 'error',
-      title: 'Qualcosa è andato storto',
-      body: 'Riprova tra qualche minuto',
-      animate: true
-    })
-  }
-
-  function handleLogout(e) {
-    e.preventDefault()
-    dispatch(userLogout())
-    router.push('/')
-  }
-
-  const modifyPrenotation = async () => {
-    console.log('Modifico prenotazione...')
-    setIsSendingRequest(true)
-    const patchBody = {
-      id: selectedMerchant.id,
-      merchantId: selectedMerchant.id,
-      dateOfPrenotation: selectedMerchant.dateOfPrenotation,
-      date: selectedMerchant.dateOfPrenotation,
-      amount: requestingSeats,
-      enabled: true,
-      valid: true
-    }
-    try {
-      await axiosPrenotation.patch(
-        '/', patchBody,
-        { headers: { 'access-token': props.token } }
-      )
-
-      setAlert({
-        type: 'success',
-        title: `Modifica avvenuta con successo`,
-        body: ` `
-
-      })
-      setIsSendingRequest(false)
-      setIsOpenDialog(false)
-    } catch (error) {
-      console.log(error)
-      setIsOpenDialog(false)
-      setIsSendingRequest(false)
-      setAlert({
-        type: 'error',
-        title: 'Errore',
-        body: 'Ci dispiace, qualcosa è andato storto'
-      })
-    }
-  }
-
-  function handleRequestingSeatsChange(type) {
-    switch (type) {
-      case 'plus':
-        setRequestingSeats(requestingSeats => requestingSeats += 1)
-        break
-      case 'minus':
-        if (requestingSeats - 1 > 0)
-          setRequestingSeats(requestingSeats => requestingSeats -= 1)
-
-        break
-      default:
-        console.log('No good')
-    }
-  }
-
-  useEffect(() => {
-    console.log(isOpenDialog)
-  }, [isOpenDialog])
 
   return (
     <>
       <Head>
-        <title>CePosto | Profilo</title>
+        <title>CePosto | Gestione</title>
       </Head>
       <div className="w-full">
         {!isObjectEmpty(alert) && (
@@ -155,52 +35,9 @@ const Manage = (props) => {
             <div id='info' className='w-full text-center'>
               <h2 className='text-center text-3xl'>I miei ristoranti</h2>
 
-              <p className={`w-1/2 text-left mx-auto rounded border-6 border-gray-400
-               p-3`}>
-                Nome: {user.firstName}<br />
-                Cognome: {user.lastName}<br />
-                Telefono: {user.phone} <br />
-                Email: {user.email} <br />
-              </p>
 
             </div>
-            <div id='books' className='w-full text-center'>
-              <h2 className='text-center text-3xl'>Le mie prenotazioni</h2>
-              <p className={`w-1/2 text-left mx-auto rounded border-6 border-gray-400
-               p-3`}>
-                {prenotations
-                  .filter(book => book.owner === user.id).length > 0
-                  ? prenotations
-                    .filter(book => book.owner === user.id)
-                    .sort((a, b) => a.valid < b.valid)
-                    .map(
-                      book => {
-                        return (
-                          <BookCard
-                            id={book.id}
-                            name={
-                              merchants.filter(
-                                merchant => merchant.id === book.merchantId
-                              )[0].storeName
-                            }
-                            dateOfPrenotation={book.dateOfPrenotation}
-                            amount={book.amount}
-                            valid={book.valid}
-                            merchant={merchants.filter(
-                              merchant => merchant.id === book.merchantId
-                            )[0]}
-                            token={props.token}
-                            onSuccessfullDismiss={onSuccessfullDismiss}
-                            onErrorDismiss={onErrorDismiss}
-                            setisopen={openUpdate}
-                          />
-                        )
-                      }
-                    )
-                  : 'Non sono presenti prenotazioni.'
-                }
-              </p>
-            </div>
+
           </div>
         </div>
       </div>

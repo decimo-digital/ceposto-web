@@ -8,15 +8,20 @@ const USER_LOGOUT = 'USER_LOGOUT'
 
 // Actions
 const userLogin = (token, email) => {
+  cookie.set('lamadonna', 'ciao')
   return async function login(dispatch, getState) {
     let options = {
       expires: 0.25, // six hours
       secure: true,
       sameSite: 'Lax'
     } //, httpOnly: true }
-
-    if (typeof cookie.get('token') === 'undefined')
+    console.log('porcamdonnalogin', token, options)
+    console.log(cookie.get('token'), typeof cookie.get('token'))
+    if (typeof cookie.get('token') === 'undefined') {
+      console.log('madiomerda')
       cookie.set('token', token, options)
+    }
+
 
     dispatch({ type: USER_LOGIN, payload: { token, username: email } })
 

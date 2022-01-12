@@ -16,6 +16,7 @@ import BookCard from 'components/BookCard'
 import { useStore, useDispatch } from 'react-redux'
 import { axiosPrenotation } from 'utils/axiosInstance'
 import InputBook from 'components/InputBook'
+import { signOut } from "next-auth/react"
 
 const Profile = (props) => {
   const dispatch = useDispatch()
@@ -79,6 +80,7 @@ const Profile = (props) => {
 
   function handleLogout(e) {
     e.preventDefault()
+    signOut({ redirect: false })
     dispatch(userLogout())
     router.push('/')
   }
@@ -164,7 +166,7 @@ const Profile = (props) => {
 
               <p className={`w-1/2 text-left mx-auto rounded border-6 border-gray-400
                p-3`}>
-                Nome: {user.firstName}<br />
+                Nome: {(user.firstName).split(' ')[0]}<br />
                 Cognome: {user.lastName}<br />
                 Email: {user.email} <br />
               </p>
