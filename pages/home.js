@@ -46,7 +46,20 @@ const Home = (props) => {
         image: 'cadrega.jpg'
       },
     ]
-  const pageCount = Number(((merchants.length / 10) + 1).toFixed(0))
+
+  const [pageCount, setPageCount] = useState(Number(((merchants.length / 10) + 1).toFixed(0)))
+
+  useEffect(() => {
+    if (page !== 1) setPage(1)
+    setPageCount(
+      Number(((merchants
+        .filter(merchant =>
+          ((merchant.storeName).toLowerCase()).includes(filter))
+        .length / 10) + 1).toFixed(0))
+    )
+    console.log(pageCount)
+  }, [filter])
+
   return (
     <>
       <Head>
@@ -111,14 +124,12 @@ const Home = (props) => {
                 )
             }
           </div>
-
-
           {
             merchants
               .filter(merchant =>
                 ((merchant.storeName).toLowerCase()).includes(filter))
               .slice((page - 1) * 10, (page - 1) * 10 + 10)
-              .length > 0 && pageCount > 1 && (
+              .length > 1 && pageCount > 1 && (
               <div className="pt-2 pb-6 ">
                 <div id="card" className="items-center xl:mx-64 lg:mx-auto">
 
@@ -129,15 +140,20 @@ const Home = (props) => {
                           setPage(page => page -= 1)
                         }
                       }}>
-                      <div className="flex flex-col md:flex-row overflow-hidden h-12
-                                             bg-gray-300 rounded-lg shadow-xl  mt-4 w-100 mx-2">
-                        <p className='self-center mx-auto uppercase cursor-pointer'>indietro</p>
-                      </div>
+                      {
+                        page == 1
+                          ? ''
+                          : <div className="flex flex-col md:flex-row overflow-hidden h-12
+                          bg-gray-300 rounded-lg shadow-xl  mt-4 w-100 mx-2">
+                            <p className='self-center mx-auto uppercase cursor-pointer'>indietro</p>
+                          </div>
+                      }
+
                     </Button>
                     <Button>
                       <div className="flex flex-col md:flex-row overflow-hidden h-12
                                              bg-gray-300 rounded-lg shadow-xl  mt-4 w-100 mx-2 cursor-normal">
-                        <p className='self-center mx-auto uppercase'>{page}</p>
+                        <p className='self-center mx-auto uppercase'>{page}/{pageCount}</p>
                       </div>
                     </Button>
                     <Button
