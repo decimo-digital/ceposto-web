@@ -13,11 +13,12 @@ import Dialog from 'components/Dialog'
 import AlertFloat from 'components/AlertFloat'
 import isObjectEmpty from 'utils/isObjectEmpty'
 import Input from 'components/Input'
-import { axiosMerchant, axiosPrenotation } from 'utils/axiosInstance'
+import { axiosMenu, axiosMerchant, axiosPrenotation } from 'utils/axiosInstance'
 import Infobox from 'components/Infobox'
 import InputBook from 'components/InputBook'
 import MerchantCard from 'components/MerchantCard'
-import { updateMerchantFreeSeats } from 'state/units/actions'
+import { getMenu, updateMerchantFreeSeats } from 'state/units/actions'
+import Accordion from 'components/Accordion'
 
 const Merchants = (props) => {
   const dispatch = useDispatch()
@@ -27,6 +28,7 @@ const Merchants = (props) => {
   const [isSendingRequest, setIsSendingRequest] = useState(false)
 
   const user = useSelector(state => state.user)
+  const menu = useSelector(state => state.merchants.menu)
 
   const sendPrenotationRequest = async () => {
     console.log('Invio prenotazione...', dayjs().unix())
@@ -77,7 +79,6 @@ const Merchants = (props) => {
     }
 
   }
-
 
   function handleRequestingSeatsChange(type) {
     switch (type) {
@@ -166,6 +167,23 @@ const Merchants = (props) => {
 
 
             <div className='container w-100 lg:w-4/5 mx-auto flex flex-col'>
+              <div className='p-4 '>Consulta il menù</div>
+              <Accordion
+                name='Antipasti'
+                items={menu.items.appetizers}
+              />
+              <Accordion
+                name='Primi'
+                items={menu.items.first_dishes} />
+              <Accordion
+                name='Secondi'
+                items={menu.items.second_dishes} />
+              <Accordion
+                name='Dessert'
+                items={menu.items.dessert} />
+              <Accordion
+                name='Pizze'
+                items={menu.items.pizza} />
               Ai nostri clienti piace anche. . .
               {/* <div className='border border-1 border-gray-200 rounded-md '>
                 {
@@ -283,6 +301,7 @@ Merchants.getInitialProps = async (context) => {
       `/${urlCurrentMerchant}/data`,
       { headers: { 'access-token': token } }
     )
+    await reduxStore.dispatch(getMenu(urlCurrentMerchant))
 
     return {
       token,

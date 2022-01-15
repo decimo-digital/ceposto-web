@@ -1,15 +1,9 @@
-import axiosRes, {
-  axiosUsers,
+import {
+  axiosMenu,
   axiosMerchant,
-  axiosUnits
 } from 'utils/axiosInstance'
-import axiosInstance from 'utils/axiosInstance'
-import { unitScopes, statUses, userRoles, assetsCodeOptions } from 'utils/enums'
-import isObjectEmpty from 'utils/isObjectEmpty'
-import dayjs from 'dayjs'
-import { formatWeekdayShort } from 'utils/localeUtils'
-import { readBinaryPhoto } from 'utils/fileReader'
-import decamelizeObject from 'utils/decamelizeObject'
+import { menuItemsType } from 'utils/enums'
+
 
 /* Action types */
 
@@ -17,9 +11,12 @@ import decamelizeObject from 'utils/decamelizeObject'
 const GET_MERCHANTS = 'GET_MERCHANTS'
 const UPDATE_MERCHANT_FREE_SEATS = 'UPDATE_MERCHANT_FREE_SEATS'
 
+// Menu
+const GET_MENU = 'GET_MENU'
+
 /* Actions */
 
-// Units
+// Merchants
 const getMerchants = () => {
   console.log('\nGetMerchants')
   return async (dispatch, getState) => {
@@ -56,10 +53,38 @@ const updateMerchantFreeSeats = ({ merchantId, updatedFreeSeats }) => {
   }
 }
 
+// Menu
+const getMenu = (merchantId) => {
+  console.log('\nGetMenu')
+  return async (dispatch, getState) => {
+    const { token } = getState().auth
+
+    const { data: menu } = await axiosMenu.get(`/${merchantId}`,
+      { headers: { 'access-token': token } })
+
+
+    dispatch({
+      type: 'GET_MENU',
+      payload: {
+        id: merchantId, menu: {
+          appetizers: menu.filter(item => item.categoryId === menuItemsType.APPETIZERS),
+          first_dishes: menu.filter(item => item.categoryId === menuItemsType.FIRST_DISHES),
+          second_dishes: menu.filter(item => item.categoryId === menuItemsType.SECOND_DISEHS),
+          pizza: menu.filter(item => item.categoryId === menuItemsType.PIZZA),
+          dessert: menu.filter(item => item.categoryId === menuItemsType.DESSERT)
+        }
+      }
+    })
+  }
+}
+
+
 
 export {
   GET_MERCHANTS,
   UPDATE_MERCHANT_FREE_SEATS,
+  GET_MENU,
+  getMenu,
   getMerchants,
   updateMerchantFreeSeats
 }

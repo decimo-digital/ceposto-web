@@ -41,59 +41,6 @@ const Manage = (props) => {
           </div>
         </div>
       </div>
-      <Dialog
-        isOpen={isOpenDialog}
-        handleDismiss={() => { setIsOpenDialog(false) }}
-      >
-        <div className="mt-4 space-y-8">
-          <h2 className='font-medium text-2xl text-gray-500'>
-            Modifica prenotazione
-          </h2>
-          <span>Seleziona il numero di posti:</span>
-          <div className='grid grid-cols-3'>
-
-            <Button
-              onClick={() => handleRequestingSeatsChange('minus')}
-              className='border border-2 border-red-200 rounded' >
-              <p className='text-6xl'>-</p>
-            </Button>
-
-            <div className='flex items-center'>
-              <div className='w-1/2 mx-auto'>
-                <InputBook
-                  isRequired={false}
-                  value={requestingSeats}
-                  onChange={(e) => {
-                    if (Number(e.target.value) <= selectedMerchant.freeSeats
-                      && Number(e.target.value > 0))
-                      setRequestingSeats(Number(e.target.value))
-                  }}
-                />
-              </div>
-            </div>
-
-            <Button
-              onClick={() => handleRequestingSeatsChange('plus')}
-              disabled={Number(selectedMerchant.freeSeats) - Number(requestingSeats) < 1}
-              className='border border-2 border-green-200 rounded'
-            >
-              <p className='text-6xl'>+</p>
-            </Button>
-
-          </div>
-
-          <div className='mx-auto text-right'>
-            <Button
-              variant='primary'
-              onClick={modifyPrenotation}
-            >
-              Conferma
-            </Button>
-          </div>
-
-        </div>
-
-      </Dialog>
     </>
   )
 }

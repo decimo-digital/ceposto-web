@@ -8,10 +8,15 @@ const daysOfWeek = {
   SUN: 'DOMENICA'
 }
 
-const monthsOfYear = {
-
+const menuItemsType = {
+  APPETIZERS: 1,
+  FIRST_DISHES: 2,
+  SECOND_DISEHS: 3,
+  PIZZA: 4,
+  DESSERT: 5,
 }
 
 module.exports = {
   daysOfWeek,
+  menuItemsType
 }

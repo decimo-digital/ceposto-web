@@ -1,6 +1,7 @@
 import {
   GET_MERCHANTS,
   UPDATE_MERCHANT_FREE_SEATS,
+  GET_MENU,
 } from './actions'
 
 
@@ -20,6 +21,13 @@ const merchantsReducer = (state = {}, action) => {
               }
               : merchant
         )
+      }
+    case GET_MENU:
+      return {
+        ...state, menu: {
+          id: payload.id,
+          items: payload.menu
+        }
       }
     // case UPDATE_UNIT:
     //   return {

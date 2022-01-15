@@ -17,6 +17,10 @@ const axiosPrenotation = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_API_SERVER}/prenotation`
 })
 
+const axiosMenu = axios.create({
+  baseURL: `${process.env.NEXT_PUBLIC_API_SERVER}/menu`
+})
+
 const axiosRes = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_SERVER
 })
@@ -26,5 +30,6 @@ export {
   axiosAuth,
   axiosMerchant,
   axiosPrenotation,
-  axiosUsers
+  axiosUsers,
+  axiosMenu
 }
