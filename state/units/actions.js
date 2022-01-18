@@ -10,9 +10,11 @@ import { menuItemsType } from 'utils/enums'
 // Merchants
 const GET_MERCHANTS = 'GET_MERCHANTS'
 const UPDATE_MERCHANT_FREE_SEATS = 'UPDATE_MERCHANT_FREE_SEATS'
+const ADD_MERCHANT = 'ADD_MERCHANT'
 
 // Menu
 const GET_MENU = 'GET_MENU'
+const ADD_EMPTY_MENU = 'ADD_EMPTY_MENU'
 
 /* Actions */
 
@@ -30,6 +32,22 @@ const getMerchants = () => {
     dispatch({
       type: 'GET_MERCHANTS',
       payload: { merchants }
+    })
+  }
+}
+
+const addMerchant = (merchantInfos) => {
+  return async (dispatch, getState) => {
+    const { token } = getState().auth
+
+    await axiosMerchant.post(
+      `/`, merchantInfos,
+      { headers: { 'access-token': token } }
+    )
+
+    dispatch({
+      type: 'ADD_MERCHANT',
+      payload: { merchantInfos }
     })
   }
 }
@@ -54,24 +72,47 @@ const updateMerchantFreeSeats = ({ merchantId, updatedFreeSeats }) => {
 }
 
 // Menu
-const getMenu = (merchantId) => {
-  console.log('\nGetMenu')
+const getMenu = (merchantId, isFromAdmin = false) => {
   return async (dispatch, getState) => {
     const { token } = getState().auth
 
     const { data: menu } = await axiosMenu.get(`/${merchantId}`,
       { headers: { 'access-token': token } })
 
+    if (isFromAdmin)
+      dispatch({
+        type: 'GET_MENU',
+        payload: {
+          id: merchantId, menu
+        }
+      })
+    else
+      dispatch({
+        type: 'GET_MENU',
+        payload: {
+          id: merchantId, menu: {
+            appetizers: menu.filter(item => item.categoryId === menuItemsType.APPETIZERS),
+            first_dishes: menu.filter(item => item.categoryId === menuItemsType.FIRST_DISHES),
+            second_dishes: menu.filter(item => item.categoryId === menuItemsType.SECOND_DISEHS),
+            pizza: menu.filter(item => item.categoryId === menuItemsType.PIZZA),
+            dessert: menu.filter(item => item.categoryId === menuItemsType.DESSERT)
+          }
+        }
+      })
+  }
+}
 
+const addEmptyItemMenu = () => {
+  return async (dispatch, getState) => {
     dispatch({
-      type: 'GET_MENU',
+      type: 'ADD_EMPTY_MENU',
       payload: {
-        id: merchantId, menu: {
-          appetizers: menu.filter(item => item.categoryId === menuItemsType.APPETIZERS),
-          first_dishes: menu.filter(item => item.categoryId === menuItemsType.FIRST_DISHES),
-          second_dishes: menu.filter(item => item.categoryId === menuItemsType.SECOND_DISEHS),
-          pizza: menu.filter(item => item.categoryId === menuItemsType.PIZZA),
-          dessert: menu.filter(item => item.categoryId === menuItemsType.DESSERT)
+        newPiatto: {
+          menuItemId: 123,
+          merchantId: 1,
+          categoryId: 1,
+          name: 'aaa',
+          price: 10
         }
       }
     })
@@ -84,7 +125,11 @@ export {
   GET_MERCHANTS,
   UPDATE_MERCHANT_FREE_SEATS,
   GET_MENU,
+  ADD_MERCHANT,
+  ADD_EMPTY_MENU,
   getMenu,
   getMerchants,
-  updateMerchantFreeSeats
+  updateMerchantFreeSeats,
+  addMerchant,
+  addEmptyItemMenu
 }

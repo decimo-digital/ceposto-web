@@ -64,7 +64,7 @@ function Layout({ children, title = 'CePosto' }) {
           <header className="bg-black sticky top-0 z-10">
 
 
-            <Navbar userId={user.id} />
+            <Navbar userId={user.id} userIsMerchant={user.merchant} />
           </header>
           <main className="w-full h-full bg-gray-100">
             <div className="grid">{children}</div>

@@ -1,7 +1,9 @@
 import {
   GET_MERCHANTS,
+  ADD_MERCHANT,
   UPDATE_MERCHANT_FREE_SEATS,
   GET_MENU,
+  ADD_EMPTY_MENU
 } from './actions'
 
 
@@ -10,6 +12,11 @@ const merchantsReducer = (state = {}, action) => {
   switch (type) {
     case GET_MERCHANTS:
       return { ...state, merchants: payload.merchants }
+    case ADD_MERCHANT:
+      return {
+        ...state,
+        merchants: [...state.merchants, payload.merchantInfos]
+      }
     case UPDATE_MERCHANT_FREE_SEATS:
       return {
         ...state,
@@ -27,6 +34,18 @@ const merchantsReducer = (state = {}, action) => {
         ...state, menu: {
           id: payload.id,
           items: payload.menu
+        }
+      }
+
+    case ADD_EMPTY_MENU:
+      console.log('diocane', payload)
+      return {
+        ...state, menu:
+        {
+          items: [
+            ...state.menu.items,
+            payload.newPiatto
+          ]
         }
       }
     // case UPDATE_UNIT:

@@ -48,6 +48,7 @@ const AlertFloat = props => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 24 }}
       transition={{ duration: 0.4 }}
+      style={{ zIndex: 99999 }}
       className='container fixed bottom-0 mx-auto inset-x-0 mb-4 z-10'
     >
       <div className={`relative ${color} p-4 rounded text-white`}>

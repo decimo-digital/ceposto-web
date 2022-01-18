@@ -1,24 +1,172 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import nextCookie from 'next-cookies'
 import { initializeStore } from 'state/store'
-import { useRouter } from 'next/router'
 import Router from 'next/router'
 import { checkToken } from 'utils/checkToken'
 import initStore from 'state/initStore'
 import { userLogout } from 'state/auth/actions'
 import Head from 'next/head'
-import Button from "../../components/Button"
-import dayjs from 'dayjs'
 import Dialog from 'components/Dialog'
+import { axiosPrenotation, axiosMenu } from 'utils/axiosInstance'
+import { useSelector, useDispatch } from 'react-redux'
+import MerchantCard from 'components/MerchantCard'
+import BookCard from 'components/BookCard'
+import Button from 'components/Button'
+import { Field, Form, Formik, isObject } from 'formik'
+import Input from 'components/Input'
+import { addEmptyItemMenu, addMerchant, getMerchants } from 'state/units/actions'
 import AlertFloat from 'components/AlertFloat'
 import isObjectEmpty from 'utils/isObjectEmpty'
-import BookCard from 'components/BookCard'
-import { useStore, useDispatch } from 'react-redux'
-import { axiosPrenotation } from 'utils/axiosInstance'
-import InputBook from 'components/InputBook'
-
+import MenuCard from 'components/MenuCard'
+import { getMenu } from 'state/units/actions'
 const Manage = (props) => {
   const dispatch = useDispatch()
+  const user = useSelector(state => state.user)
+  const myMerchants = useSelector(state => state
+    .merchants.merchants
+    .filter(merchant => merchant.owner === user.id)
+  )
+
+  const [alert, setAlert] = useState(false)
+  const [isOpenBookDialog, setIsOpenBookDialog] = useState(false)
+  const [isOpenMenuDialog, setIsOpenMenuDialog] = useState(false)
+  const [isOpenAddMerchantDialog, setIsOpenAddMerchantDialog] = useState(false)
+  const [merchantInManage, setMerchantInManage] = useState({ id: -1, name: '' })
+  const [prenotations, setPrenotations] = useState([])
+  const [isAddingItemToMenu, setIsAddingItemToMenu] = useState(false)
+  let [newItems, setNewItems] = useState([])
+  const menu = useSelector(state => state.merchants.menu)
+
+  useEffect(() => {
+    console.log('-->?', isAddingItemToMenu)
+  }, [isAddingItemToMenu])
+
+  useEffect(() => {
+    console.log('-->?', newItems)
+  }, [newItems])
+
+
+  const getPrenotation = async ({ merchantId }) => {
+    const { data: prenot } = await axiosPrenotation.get(
+      `/${merchantId}/prenotations`,
+      { headers: { 'access-token': props.token } }
+    )
+
+    setPrenotations(prenot)
+  }
+
+  const getMenuInPlace = async ({ merchantId }) => {
+    try {
+
+      await dispatch(getMenu(merchantId, true))
+    } catch (error) {
+      console.error(error)
+      setAlert({
+        type: 'error',
+        title: 'Qualcosa è andato storto',
+        body: 'Si prega di riprovare tra qualche minuto',
+        animate: true
+      })
+    }
+  }
+
+  const addNewMerchant = async (merchantInfos) => {
+    try {
+      await dispatch(addMerchant(merchantInfos))
+      setAlert({
+        type: 'success',
+        title: ` ${merchantInfos.storeName} inserito correttamente!`,
+        body: `Completa la configurazione del tuo ristorante aggiungendo un menu`
+
+      })
+    } catch (err) {
+      console.error(err)
+      setAlert({
+        type: 'error',
+        title: 'Qualcosa è andato storto',
+        body: 'Si prega di riprovare tra qualche minuto',
+        animate: true
+      })
+    }
+  }
+
+  const addMenuItem = async (values, sele, merchantId) => {
+    try {
+      await axiosMenu.post(
+        `/${merchantId}`, {
+        name: values.name,
+        price: values.price,
+        categoryId: sele,
+        merchantId
+      },
+        { headers: { 'access-token': props.token } }
+      )
+      setAlert({
+        type: 'success',
+        title: `Piatto aggiunto correttamente!`,
+      })
+      return 1
+    } catch (error) {
+      console.error(error)
+      setAlert({
+        type: 'error',
+        title: 'Qualcosa è andato storto',
+        body: 'Si prega di riprovare tra qualche minuto',
+        animate: true
+      })
+
+    }
+  }
+
+  const updateMenuItem = async (values, sele, merchantId) => {
+    try {
+      await axiosMenu.patch(
+        `/${merchantId}`, {
+        id: values.id,
+        name: values.name,
+        price: values.price,
+        categoryId: sele
+      },
+        { headers: { 'access-token': props.token } }
+      )
+      setAlert({
+        type: 'success',
+        title: `Piatto aggiornato correttamente!`,
+      })
+    } catch (error) {
+      console.error(error)
+      setAlert({
+        type: 'error',
+        title: 'Qualcosa è andato storto',
+        body: 'Si prega di riprovare tra qualche minuto',
+        animate: true
+      })
+    }
+  }
+
+  const deleteMenuItem = async (id, merchantId) => {
+    try {
+      await axiosMenu.delete(
+        `/${merchantId}/${id}`,
+        { headers: { 'access-token': props.token } }
+      )
+      setAlert({
+        type: 'success',
+        title: `Piatto eliminato correttamente!`,
+      })
+      return 1
+    } catch (error) {
+      console.error(error)
+      setAlert({
+        type: 'error',
+        title: 'Qualcosa è andato storto',
+        body: 'Si prega di riprovare tra qualche minuto',
+        animate: true
+      })
+    }
+  }
+
+
 
   return (
     <>
@@ -33,14 +181,262 @@ const Manage = (props) => {
           <div className="container w-100 lg:w-4/5 mx-auto flex flex-col space-y-4">
 
             <div id='info' className='w-full text-center'>
-              <h2 className='text-center text-3xl'>I miei ristoranti</h2>
+              <div className='flex text-3xl items-center'>
+                <div className='ml-auto m-2'>I miei ristoranti</div>
+                <div className='mr-auto ml-0'>
+                  <Button
+                    onClick={() => { setIsOpenAddMerchantDialog(true) }}
+                    variant={'primary'}
+                  >+</Button></div>
 
-
+              </div>
+              <div>
+                {
+                  myMerchants.map(
+                    ({ id, storeName }) => {
+                      return <MerchantCard
+                        id={id}
+                        name={storeName}
+                        description={''}
+                        image={''}
+                        type={'short'}
+                        isFromMenage={true}
+                        onClick={async () => {
+                          await getPrenotation({ merchantId: id })
+                          setMerchantInManage({ id, name: storeName })
+                          setIsOpenBookDialog(true)
+                        }}
+                        onClickMenu={
+                          async () => {
+                            setMerchantInManage({ id, name: storeName })
+                            await getMenuInPlace({ merchantId: id })
+                            setIsOpenMenuDialog(true)
+                          }
+                        }
+                      />
+                    }
+                  )
+                }
+              </div>
             </div>
 
           </div>
         </div>
       </div>
+
+      <Dialog
+        isOpen={isOpenBookDialog}
+        handleDismiss={() => {
+          setIsOpenBookDialog(false)
+        }}
+        type='prenotation'
+      >
+        <div className="mt-4 space-y-8">
+          <h2 className='font-medium text-2xl text-gray-500'>
+            Prenotazioni di {merchantInManage.name}
+          </h2>
+          {prenotations.length > 0
+            ? prenotations
+              .sort((a, b) => a.valid < b.valid)
+              .map(
+                book => {
+                  return (
+                    <BookCard
+                      id={book.id}
+                      name={
+                        myMerchants.filter(
+                          merchant => merchant.id === book.merchantId
+                        )[0].storeName
+                      }
+                      dateOfPrenotation={book.dateOfPrenotation}
+                      amount={book.amount}
+                      valid={book.valid}
+                      merchant={myMerchants.filter(
+                        merchant => merchant.id === book.merchantId
+                      )[0]}
+                      token={props.token}
+                    // onSuccessfullDismiss={onSuccessfullDismiss}
+                    // onErrorDismiss={onErrorDismiss}
+                    // setisopen={openUpdate}
+                    />
+                  )
+                }
+              )
+            : <div>Non sono presenti prenotazioni.</div>
+          }
+        </div>
+      </Dialog>
+
+      <Dialog
+        isOpen={isOpenMenuDialog}
+        handleDismiss={() => {
+
+          setIsAddingItemToMenu(false)
+          setNewItems([])
+          setIsOpenMenuDialog(false)
+        }}
+        type='menu'
+      >
+        <div className="mt-4 space-y-8 max-h-fit overflow-auto">
+
+          <div className='flex text-3xl items-center'>
+            <h2 className='font-medium text-2xl text-gray-500'>
+              Menu di {merchantInManage.name}
+            </h2>
+            <div className='mr-auto ml-4'>
+              <Button
+                onClick={async () => {
+                  setNewItems(newItem => [...newItem, 1])
+                  setIsAddingItemToMenu(true)
+                }}
+                variant={'primary'}
+              >+</Button></div>
+          </div>
+          {typeof menu !== 'undefined' && (menu.items).length > 0
+            ? <>
+              {
+                isAddingItemToMenu && (
+                  newItems.map(
+                    newItem => {
+                      return (
+                        <MenuCard
+                          id={-1}
+                          name={''}
+                          price={0}
+                          categoryId={1}
+                          updateMenuItem={updateMenuItem}
+                          deleteMenuItem={deleteMenuItem}
+                          addMenuItem={addMenuItem}
+                          merchantId={merchantInManage.id}
+                        />
+                      )
+                    }
+                  )
+                )
+              }
+              {
+                menu?.items
+                  .sort((a, b) => a.categoryId >= b.categoryId)
+                  .map(
+                    item => {
+                      return (
+                        <MenuCard
+                          id={item.menuItemId}
+                          name={item.name}
+                          price={item.price}
+                          categoryId={item.categoryId}
+                          updateMenuItem={updateMenuItem}
+                          deleteMenuItem={deleteMenuItem}
+                          merchantId={item.merchantId}
+                        />
+                      )
+                    }
+                  )
+              }
+            </>
+            : <div>
+              <p>Non sono presenti menu. </p>
+              <p>Aggiungi piatti utilizzando il tasto '+'</p>
+            </div>
+          }
+        </div>
+      </Dialog>
+
+      <Dialog
+        isOpen={isOpenAddMerchantDialog}
+        handleDismiss={() => {
+          setIsOpenAddMerchantDialog(false)
+        }}
+        type='prenotation'
+      >
+        <div className="mt-4 space-y-8">
+          <h2 className='font-medium text-2xl text-gray-500'>
+            Aggiungi ristorante
+          </h2>
+          <Formik
+            initialValues={{
+              storeName: '',
+              storeDescription: '',
+              totalSeats: 0
+            }}
+            validate={(values) => {
+              const errors = {}
+              //check su input
+              return errors
+            }}
+            onSubmit={async (values, actions) => {
+              await addNewMerchant({
+                storeName: values.storeName,
+                storeDescription: values.storeDescription,
+                totalSeats: values.totalSeats,
+                storeLocation: {
+                  x: 0,
+                  y: 0
+                },
+                distance: 0,
+                cuisineType: values.cuisineType,
+                owner: user.id,
+                freeSeats: values.totalSeats,
+                occupancyRate: 0
+              })
+            }}
+          >
+            {({ values, errors, setFieldValue, isSubmitting }) => (
+              <Form>
+                <div className="space-y-8">
+                  <div className="grid grid-cols-2 md:space-x-4 col-gap-4 space-y-2 md:grid-cols-2 xl:grid-cols-2 sm:space-y-0">
+                    <Field name="storeName">
+                      {({ field, form: { touched, errors }, meta }) => (
+                        <Input
+                          name={field.storeName}
+                          type="text"
+                          label="Nome ristorante"
+                          isRequired={false}
+                          isInvalid={touched.storeName && errors.storeName}
+                          invalidText={errors.storeName}
+                          {...field}
+                        />
+                      )}
+                    </Field>
+                    <Field name="totalSeats">
+                      {({ field, form: { touched, errors }, meta }) => (
+                        <Input
+                          name={field.totalSeats}
+                          type="number"
+                          label="Numero coperti"
+                          isRequired={false}
+                          min={0}
+                          isInvalid={touched.totalSeats && errors.totalSeats}
+                          {...field}
+                        />
+                      )}
+                    </Field>
+                  </div>
+                  <div className="grid grid-cols-1 md:space-x-4 col-gap-4 space-y-2 md:grid-cols-2 xl:grid-cols-2 sm:space-y-0">
+                    <div>
+                      <p>Descrizione</p>
+                      <textarea
+                        className="w-full text-gray-700 border-2 rounded-md border-gray-300 bg-white border-opacity-5 h-24 min-h-24"
+                        value={values.storeDescription}
+                        onChange={(e) => {
+                          setFieldValue('storeDescription', e.target.value)
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <Button
+                    variant="primary"
+                  >
+                    CONFERMA
+                  </Button>
+
+                </div>
+              </Form>
+            )}
+          </Formik>
+        </div>
+      </Dialog>
     </>
   )
 }

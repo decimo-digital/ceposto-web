@@ -4,7 +4,17 @@ import {
 } from '@reach/dialog'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const Dialog = ({ isOpen, handleDismiss, children, ...props }) => {
+const Dialog = ({ isOpen, handleDismiss, children, type, ...props }) => {
+  let width = '400px'
+  switch (type) {
+    case 'menu':
+      width = '750px'
+      break
+    case 'prenotation':
+      width = '650px'
+      break
+  }
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -16,11 +26,11 @@ const Dialog = ({ isOpen, handleDismiss, children, ...props }) => {
           <motion.div
             key="modal"
             transition={{ duration: 0.3 }}
-            initial={{ opacity: 0, scale: 0 }}
+            initial={type == 'menu' ? {} : { opacity: 0, scale: 0 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0 }}
           >
-            <ReachDialogContent {...props} style={{ borderRadius: '6px', width: '400px' }}>
+            <ReachDialogContent {...props} style={{ borderRadius: '6px', width: width }}>
               {children}
             </ReachDialogContent>
           </motion.div>

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-const MerchantCard = ({ id, name, description, image, type }) => {
+const MerchantCard = ({ id, name, description, image, type, isFromMenage = false, onClick, onClickMenu }) => {
   console.log(id, name, (Math.random() * 5).toFixed(0))
   switch (type) {
     case 'full':
@@ -35,28 +35,36 @@ const MerchantCard = ({ id, name, description, image, type }) => {
 
     case 'short':
       return (
-        <Link href={`/merchants/${id}`}>
-          <div className="p-2">
-            <div id="card">
-              <div className="container w-100 lg:w-4/5 mx-auto flex flex-col">
+        <div className="p-2">
+          <div id="card">
+            <div className="container w-100 lg:w-4/5 mx-auto flex flex-col">
 
-                <div v-for="card in cards" className="flex flex-col md:flex-row overflow-hidden
+              <div v-for="card in cards" className="flex flex-col md:flex-row overflow-hidden
                                          bg-gray-300 rounded-lg shadow-xl w-100">
-                  <div className="h-24 w-24 md:w-24">
-                    <img className="inset-0 h-full w-full object-cover object-center" src={`${image}`} />
-                  </div>
+                <div className="h-24 w-24 md:w-24">
+                  <img className="inset-0 h-full w-full object-cover object-center" src={`/sample-${id % 10 + Number((Math.random() * 2).toFixed(0))}.jpg`} />
+                </div>
 
-                  <div className="w-full py-4 px-6 text-gray-800 flex flex-col">
-                    <h3 className="font-semibold text-lg leading-tight truncate">{name}</h3>
-                    <p className="mt-2">
-                      {description}
-                    </p>
+                <div className="w-full py-4 px-6 text-gray-800 flex flex-col my-auto">
+                  <h3 className="font-semibold text-lg leading-tight truncate cursor-default">{name}</h3>
+                  <p className="mt-2">
+                    {description}
+                  </p>
+                </div>
+                <div className='h-auto w-1/2 bg-gray-400 flex flex-col items-center' >
+                  <div className='h-full w-full hover:bg-gray-500 flex flex-col cursor-pointer' onClick={onClickMenu}>
+                    <div className='mx-auto my-auto'>MENU</div>
+                  </div>
+                  <div className='h-full w-full hover:bg-gray-500 flex flex-col cursor-pointer' onClick={onClick}>
+                    <div className='mx-auto my-auto'>PRENOTAZIONI</div>
+
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </Link>
+        </div>
+
 
       )
     default: <></>

@@ -2,7 +2,7 @@ import React from "react";
 import Icon, { icons } from "./Icon";
 import Link from 'next/link'
 
-export default function Navbar({ userId }) {
+export default function Navbar({ userId, userIsMerchant }) {
   const [navbarOpen, setNavbarOpen] = React.useState(false);
   return (
     <>
@@ -38,23 +38,27 @@ export default function Navbar({ userId }) {
             id="example-navbar-danger"
           >
             <ul className="flex flex-col lg:flex-row list-none lg:ml-auto">
-              <li className="nav-item">
-                <Link href={`/manage/${userId}`}>
-                  <a
-                    className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
-                  >
-                    <i className="fab fa-pinterest text-lg leading-lg text-white opacity-75"></i>
-                    <span className="ml-2">
-                      {
-                        navbarOpen
-                          ? 'Gestore'
-                          : 'Gestore'
-                        //  : <Icon name={icons.MANUAL} />
-                      }
-                    </span>
-                  </a>
-                </Link>
-              </li>
+              {
+                userIsMerchant
+                  ? <li className="nav-item">
+                    <Link href={`/manage/${userId}`}>
+                      <a
+                        className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
+                      >
+                        <i className="fab fa-pinterest text-lg leading-lg text-white opacity-75"></i>
+                        <span className="ml-2">
+                          {
+                            navbarOpen
+                              ? 'Gestore'
+                              : 'Gestore'
+                            //  : <Icon name={icons.MANUAL} />
+                          }
+                        </span>
+                      </a>
+                    </Link>
+                  </li>
+                  : ''
+              }
               <li className="nav-item">
                 <Link href={`/home`}>
                   <a

@@ -16,6 +16,7 @@ const menuItemsType = {
   DESSERT: 5,
 }
 
+
 module.exports = {
   daysOfWeek,
   menuItemsType

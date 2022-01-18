@@ -53,6 +53,7 @@ const Dropdown = ({
       handleChange(name, change?.value ?? '')
     }}
     theme={selectTheme}
+    styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
   />
 )
 

@@ -49,7 +49,8 @@ const Accordion = ({ name, items }) => {
           {
             isOpen
               ? <Card className='border-b border-r border-l rounded-t-none rounded-b-md mb-4 bg-gray-200 overflow-y-auto h-32'>
-                {
+                {items.length > 0
+                  ?
                   items.map(
                     item => {
                       return <div className='grid grid-cols-2 p-1'>
@@ -58,7 +59,7 @@ const Accordion = ({ name, items }) => {
                       </div>
                     }
                   )
-
+                  : `Non sono presenti ${name.toLowerCase()} in questo menu.`
                 }
               </Card>
               : ''
