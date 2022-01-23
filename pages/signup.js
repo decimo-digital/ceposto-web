@@ -14,6 +14,7 @@ import { axiosAuth } from 'utils/axiosInstance'
 import isObjectEmpty from 'utils/isObjectEmpty'
 const { isValidPhoneNumber } = require('libphonenumber-js')
 import { userLogin } from 'state/auth/actions'
+import { setIsMerchant } from 'state/isMerchant/actions'
 
 const variants = {
   enter: {
@@ -50,19 +51,26 @@ const Signup = () => {
   const router = useRouter()
   const store = useStore()
 
-  const [currSignupStage, setCurrSignupStage] = useState(-1)
   const [alert, setAlert] = useState({})
   const [isSendingRequest, setIsSendingRequest] = useState(false)
-  const [userInfo, setUserInfo] = useState({})
-  const [token, setToken] = useState('')
   const [fields, setFields] = useState({
     nome: { invalid: false, value: '' },
     cognome: { invalid: false, value: '' },
     email: { invalid: false, value: '' },
     phone: { invalid: false, value: '' },
     password: { invalid: false, value: '' },
-    passwordRepeat: { invalid: false, value: '' }
+    passwordRepeat: { invalid: false, value: '' },
+    isMerchant: { invalid: false, value: false },
   })
+
+  function handleFieldCheckBox(field, value) {
+    setFields((fields) => {
+      return {
+        ...fields,
+        [field]: { ...fields[field], invalid: false, value }
+      }
+    })
+  }
 
   function handleFieldChange(field, value) {
     setFields((fields) => {
@@ -82,10 +90,11 @@ const Signup = () => {
     })
   }
 
-  async function onSuccesfullRegistration(token, email) {
+  async function onSuccesfullRegistration(token, email, isMerchant = false) {
     console.log('Sto facendo la login con ', token)
     try {
       await Promise.all([
+        dispatch(setIsMerchant(isMerchant)),
         dispatch(userLogin(token, email)),
         router.push('/home')
       ])
@@ -109,6 +118,7 @@ const Signup = () => {
     let phone = fields.phone.value
     let password = fields.password.value
     let passwordRepeat = fields.passwordRepeat.value
+    let isMerchant = fields.isMerchant.value
 
     changeFieldInvalidStatus('nome', isObjectEmpty(name))
     changeFieldInvalidStatus('cognome', isObjectEmpty(surname))
@@ -153,7 +163,7 @@ const Signup = () => {
           const { accessToken } = registrationResponse
           console.log(accessToken)
           if (accessToken) {
-            onSuccesfullRegistration(accessToken, email)
+            onSuccesfullRegistration(accessToken, email, isMerchant)
           }
         } catch (err) {
           console.error(err.response.status, err.response.data.message)
@@ -192,6 +202,7 @@ const Signup = () => {
             handleSubmit={phaseOneButtonClick}
             fields={fields}
             handleFieldChange={handleFieldChange}
+            handleFieldCheckBox={handleFieldCheckBox}
             isSendingRequest={isSendingRequest}
           />
 

@@ -5,18 +5,18 @@ import Alert from 'components/Alert'
 
 import isObjectEmpty from 'utils/isObjectEmpty'
 
-import { unitScopes } from 'utils/enums'
 import Button from 'components/Button'
-import Infobox from 'components/Infobox'
-
+import Checkbox, { checkboxLabelPositions } from 'components/Checkbox'
 function PhaseOne({
   alert,
   variants,
   handleSubmit,
   fields,
   handleFieldChange,
+  handleFieldCheckBox,
   isSendingRequest = false
 }) {
+  console.log(fields.isMerchant)
   return (
     <>
       <motion.div
@@ -102,6 +102,14 @@ function PhaseOne({
               }
               id="passwordRepeat"
             />
+            <Checkbox
+              label={{
+                text: 'Sei un esercente?',
+                position: checkboxLabelPositions.RIGHT
+              }}
+              checked={fields.isMerchant.value}
+              onClick={() => handleFieldCheckBox('isMerchant', !(fields.isMerchant.value))}
+            ></Checkbox>
             <Button
               type="submit"
               fullWidth={true}

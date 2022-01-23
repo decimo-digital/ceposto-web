@@ -4,12 +4,14 @@ import merchantsReducer from './units/reducer'
 import userReducer from './user/reducer'
 import authReducer from './auth/reducer'
 import currentUnitIndexReducer from './currentUnitIndex/reducer'
+import isMerchantReducer from './isMerchant/reducer'
 
 const appReducer = combineReducers({
   auth: authReducer,
   merchants: merchantsReducer,
   currentUnitIndex: currentUnitIndexReducer,
-  user: userReducer
+  user: userReducer,
+  isMerchant: isMerchantReducer
 })
 
 const rootReducer = (state = {}, action) => {

@@ -23,6 +23,8 @@ function Layout({ children, title = 'CePosto' }) {
 
   const user = useSelector((state) => state?.user)
 
+  const isMerchantFromRegistration = useSelector((state) => state?.isMerchant)
+
   useEffect(() => {
     if (isMobileMenuOpen) setIsMobileMenuOpen(false)
   }, [router.route])
@@ -64,7 +66,7 @@ function Layout({ children, title = 'CePosto' }) {
           <header className="bg-black sticky top-0 z-10">
 
 
-            <Navbar userId={user.id} userIsMerchant={user.merchant} />
+            <Navbar userId={user.id} userIsMerchant={isMerchantFromRegistration || user.merchant} />
           </header>
           <main className="w-full h-full bg-gray-100">
             <div className="grid">{children}</div>
