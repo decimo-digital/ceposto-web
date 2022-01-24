@@ -5,13 +5,15 @@ import userReducer from './user/reducer'
 import authReducer from './auth/reducer'
 import currentUnitIndexReducer from './currentUnitIndex/reducer'
 import isMerchantReducer from './isMerchant/reducer'
+import prenotationsReducer from './prenotations/reducer'
 
 const appReducer = combineReducers({
   auth: authReducer,
   merchants: merchantsReducer,
   currentUnitIndex: currentUnitIndexReducer,
   user: userReducer,
-  isMerchant: isMerchantReducer
+  isMerchant: isMerchantReducer,
+  prenotations: prenotationsReducer
 })
 
 const rootReducer = (state = {}, action) => {

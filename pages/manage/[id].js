@@ -19,6 +19,8 @@ import AlertFloat from 'components/AlertFloat'
 import isObjectEmpty from 'utils/isObjectEmpty'
 import MenuCard from 'components/MenuCard'
 import { getMenu } from 'state/units/actions'
+import InputBook from 'components/InputBook'
+import { getMerchantPrenotations, updatePrenotation } from 'state/prenotations/actions'
 const Manage = (props) => {
   const dispatch = useDispatch()
   const user = useSelector(state => state.user)
@@ -32,28 +34,118 @@ const Manage = (props) => {
   const [isOpenMenuDialog, setIsOpenMenuDialog] = useState(false)
   const [isOpenAddMerchantDialog, setIsOpenAddMerchantDialog] = useState(false)
   const [merchantInManage, setMerchantInManage] = useState({ id: -1, name: '' })
-  const [prenotations, setPrenotations] = useState([])
+  const prenotations = useSelector(state => state.prenotations.prenotations)
   const [isAddingItemToMenu, setIsAddingItemToMenu] = useState(false)
   let [newItems, setNewItems] = useState([])
+  const [isOpenPrenotationPatchDialog, setIsOpenPrenotationPatchDialog] = useState(false)
+  const [selectedMerchant, setSelectedMerchant] = useState({})
+  const [requestingSeats, setRequestingSeats] = useState(1)
+  const [isSendingRequest, setIsSendingRequest] = useState(false)
+  const [selectedPrenotation, setSelectedPrenotation] = useState(0)
+  const [selectedPrenotationDate, setSelectedPrenotationDate] = useState(0)
   const menu = useSelector(state => state.merchants.menu)
 
-  useEffect(() => {
-    console.log('-->?', isAddingItemToMenu)
-  }, [isAddingItemToMenu])
+  async function onErrorDismiss(name, id) {
+    setAlert({
+      type: 'error',
+      title: 'Qualcosa è andato storto',
+      body: 'Riprova tra qualche minuto',
+      animate: true
+    })
+  }
 
-  useEffect(() => {
-    console.log('-->?', newItems)
-  }, [newItems])
-
-
-  const getPrenotation = async ({ merchantId }) => {
-    const { data: prenot } = await axiosPrenotation.get(
-      `/${merchantId}/prenotations`,
-      { headers: { 'access-token': props.token } }
+  async function onSuccessfullDismiss(id, name) {
+    prenotations.map(
+      prenotation => {
+        if (prenotation.id === id) {
+          prenotation.valid = false
+          prenotation.enabled = false
+        }
+      }
     )
 
-    setPrenotations(prenot)
+    setAlert({
+      type: 'success',
+      title: 'Annullamento effettuato con successo',
+      body: `La prenotazione da ${name} è stata annullata`,
+      animate: true
+    })
   }
+
+  const modifyPrenotation = async () => {
+    console.log('Modifico prenotazione...')
+    setIsSendingRequest(true)
+    const patchBody = {
+      id: selectedPrenotation,
+      merchantId: selectedMerchant.id,
+      dateOfPrenotation: selectedPrenotationDate,
+      date: selectedMerchant.dateOfPrenotation,
+      amount: requestingSeats,
+      enabled: true,
+      valid: true
+    }
+    try {
+      await axiosPrenotation.patch(
+        '/', patchBody,
+        { headers: { 'access-token': props.token } }
+      )
+
+      setAlert({
+        type: 'success',
+        title: `Modifica avvenuta con successo`,
+        body: ` `
+      })
+      await dispatch(updatePrenotation({ prenotationId: selectedPrenotation, requestingSeats }))
+      setIsSendingRequest(false)
+      setIsOpenPrenotationPatchDialog(false)
+    } catch (error) {
+      console.log(error)
+      setIsOpenPrenotationPatchDialog(false)
+      setIsSendingRequest(false)
+      setAlert({
+        type: 'error',
+        title: 'Errore',
+        body: 'Ci dispiace, qualcosa è andato storto'
+      })
+    }
+  }
+
+  function handleRequestingSeatsChange(type) {
+    switch (type) {
+      case 'plus':
+        setRequestingSeats(requestingSeats => requestingSeats += 1)
+        break
+      case 'minus':
+        if (requestingSeats - 1 > 0)
+          setRequestingSeats(requestingSeats => requestingSeats -= 1)
+
+        break
+      default:
+        console.log('No good')
+    }
+  }
+
+  useEffect(() => {
+    console.log(selectedMerchant)
+    setRequestingSeats(selectedMerchant.amount)
+  }, [selectedMerchant])
+
+  const openUpdate = (merchant, bookId, bookDate) => {
+    setSelectedPrenotation(bookId)
+    setSelectedPrenotationDate(bookDate)
+    setSelectedMerchant(merchant)
+    setIsOpenPrenotationPatchDialog(true)
+
+  }
+
+  // const getPrenotation = async ({ merchantId }) => {
+  //   const { data: prenot } = await axiosPrenotation.get(
+  //     `/${merchantId}/prenotations`,
+  //     { headers: { 'access-token': props.token } }
+  //   )
+
+  //   setPrenotations(prenot)
+  // }
 
   const getMenuInPlace = async ({ merchantId }) => {
     try {
@@ -79,6 +171,7 @@ const Manage = (props) => {
         body: `Completa la configurazione del tuo ristorante aggiungendo un menu`
 
       })
+      setIsOpenAddMerchantDialog(false)
     } catch (err) {
       console.error(err)
       setAlert({
@@ -122,11 +215,13 @@ const Manage = (props) => {
     try {
       await axiosMenu.patch(
         `/${merchantId}`, {
-        id: values.id,
+        menuItemId: values.id,
         name: values.name,
         price: values.price,
-        categoryId: sele
+        categoryId: sele,
+        merchantId
       },
+
         { headers: { 'access-token': props.token } }
       )
       setAlert({
@@ -202,7 +297,8 @@ const Manage = (props) => {
                         type={'short'}
                         isFromMenage={true}
                         onClick={async () => {
-                          await getPrenotation({ merchantId: id })
+                          //await getPrenotation({ merchantId: id })
+                          await dispatch(getMerchantPrenotations(id))
                           setMerchantInManage({ id, name: storeName })
                           setIsOpenBookDialog(true)
                         }}
@@ -255,9 +351,9 @@ const Manage = (props) => {
                         merchant => merchant.id === book.merchantId
                       )[0]}
                       token={props.token}
-                    // onSuccessfullDismiss={onSuccessfullDismiss}
-                    // onErrorDismiss={onErrorDismiss}
-                    // setisopen={openUpdate}
+                      onSuccessfullDismiss={onSuccessfullDismiss}
+                      onErrorDismiss={onErrorDismiss}
+                      setisopen={openUpdate}
                     />
                   )
                 }
@@ -367,12 +463,8 @@ const Manage = (props) => {
             onSubmit={async (values, actions) => {
               await addNewMerchant({
                 storeName: values.storeName,
-                storeDescription: values.storeDescription,
+                description: values.storeDescription,
                 totalSeats: values.totalSeats,
-                storeLocation: {
-                  x: 0,
-                  y: 0
-                },
                 distance: 0,
                 cuisineType: values.cuisineType,
                 owner: user.id,
@@ -437,6 +529,61 @@ const Manage = (props) => {
           </Formik>
         </div>
       </Dialog>
+
+      <Dialog
+        isOpen={isOpenPrenotationPatchDialog}
+        handleDismiss={() => { setIsOpenPrenotationPatchDialog(false) }}
+      >
+        <div className="mt-4 space-y-8">
+          <h2 className='font-medium text-2xl text-gray-500'>
+            Modifica prenotazione
+          </h2>
+          <span>Seleziona il numero di posti:</span>
+          <div className='grid grid-cols-3'>
+
+            <Button
+              onClick={() => handleRequestingSeatsChange('minus')}
+              className='border border-2 border-red-200 rounded' >
+              <p className='text-6xl'>-</p>
+            </Button>
+
+            <div className='flex items-center'>
+              <div className='w-1/2 mx-auto'>
+                <InputBook
+                  isRequired={false}
+                  value={requestingSeats}
+                  onChange={(e) => {
+                    if (Number(e.target.value) <= selectedMerchant.freeSeats
+                      && Number(e.target.value > 0))
+                      setRequestingSeats(Number(e.target.value))
+                  }}
+                />
+              </div>
+            </div>
+
+            <Button
+              onClick={() => handleRequestingSeatsChange('plus')}
+              disabled={Number(selectedMerchant.freeSeats) - Number(requestingSeats) < 1}
+              className='border border-2 border-green-200 rounded'
+            >
+              <p className='text-6xl'>+</p>
+            </Button>
+
+          </div>
+
+          <div className='mx-auto text-right'>
+            <Button
+              variant='primary'
+              onClick={modifyPrenotation}
+            >
+              Conferma
+            </Button>
+          </div>
+
+        </div>
+
+      </Dialog>
+
     </>
   )
 }

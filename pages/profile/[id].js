@@ -13,10 +13,11 @@ import Dialog from 'components/Dialog'
 import AlertFloat from 'components/AlertFloat'
 import isObjectEmpty from 'utils/isObjectEmpty'
 import BookCard from 'components/BookCard'
-import { useStore, useDispatch } from 'react-redux'
+import { useStore, useDispatch, useSelector } from 'react-redux'
 import { axiosPrenotation } from 'utils/axiosInstance'
 import InputBook from 'components/InputBook'
 import { signOut } from "next-auth/react"
+import { getUserPrenotations, updatePrenotation } from 'state/prenotations/actions'
 
 const Profile = (props) => {
   const dispatch = useDispatch()
@@ -32,8 +33,12 @@ const Profile = (props) => {
   const merchants = store.getState().merchants.merchants
   const [requestingSeats, setRequestingSeats] = useState(1)
   const [selectedMerchant, setSelectedMerchant] = useState({})
+  const [selectedPrenotation, setSelectedPrenotation] = useState(0)
+  const [selectedPrenotationDate, setSelectedPrenotationDate] = useState(0)
   const [isSendingRequest, setIsSendingRequest] = useState(false)
-  const openUpdate = (merchant) => {
+  const openUpdate = (merchant, bookId, bookDate) => {
+    setSelectedPrenotation(bookId)
+    setSelectedPrenotationDate(bookDate)
     setSelectedMerchant(merchant)
     setIsOpenDialog(true)
 
@@ -44,10 +49,7 @@ const Profile = (props) => {
     setRequestingSeats(selectedMerchant.amount)
   }, [selectedMerchant])
 
-  const prenotations =
-    typeof props.prenotations !== 'undefined'
-      ? props.prenotations
-      : []
+  const prenotations = useSelector(state => state.prenotations.prenotations)
 
   const today = dayjs().format('DD/MM/YYYY')
 
@@ -88,10 +90,11 @@ const Profile = (props) => {
   const modifyPrenotation = async () => {
     console.log('Modifico prenotazione...')
     setIsSendingRequest(true)
+    console.log('-->', selectedPrenotationDate)
     const patchBody = {
-      id: selectedMerchant.id,
+      id: selectedPrenotation,
       merchantId: selectedMerchant.id,
-      dateOfPrenotation: selectedMerchant.dateOfPrenotation,
+      dateOfPrenotation: selectedPrenotationDate,
       date: selectedMerchant.dateOfPrenotation,
       amount: requestingSeats,
       enabled: true,
@@ -109,6 +112,7 @@ const Profile = (props) => {
         body: ` `
 
       })
+      await dispatch(updatePrenotation({ prenotationId: selectedPrenotation, requestingSeats }))
       setIsSendingRequest(false)
       setIsOpenDialog(false)
     } catch (error) {
@@ -291,13 +295,15 @@ Profile.getInitialProps = async (context) => {
       await initStore(reduxStore, token, username)
       const idCurrentUser = reduxStore.getState().user.id
 
-      const { data: prenotations } = await axiosPrenotation.get(
-        `?userId=${idCurrentUser}`,
-        { headers: { 'access-token': token } }
-      )
+      // const { data: prenotations } = await axiosPrenotation.get(
+      //   `?userId=${idCurrentUser}`,
+      //   { headers: { 'access-token': token } }
+      // )
+
+      await reduxStore.dispatch(getUserPrenotations(idCurrentUser))
 
       return {
-        prenotations,
+        //prenotations,
         token,
         initialReduxState: reduxStore.getState()
       }

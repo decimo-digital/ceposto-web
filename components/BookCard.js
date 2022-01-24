@@ -2,7 +2,8 @@ import dayjs from 'dayjs'
 import { axiosPrenotation } from 'utils/axiosInstance'
 import Button from './Button'
 const BookCard = ({ id, name, dateOfPrenotation, amount, valid, merchant, token, onSuccessfullDismiss, onErrorDismiss, setisopen }) => {
-
+  const bookId = id
+  const bookPrenotation = dateOfPrenotation
   const dismissPrenotation = async () => {
     const dismissBody = {
       id,
@@ -16,8 +17,8 @@ const BookCard = ({ id, name, dateOfPrenotation, amount, valid, merchant, token,
     }
 
     try {
-      await axiosPrenotation.patch(
-        '/', dismissBody,
+      await axiosPrenotation.delete(
+        `/${bookId}`,
         { headers: { 'access-token': token } }
       )
       onSuccessfullDismiss(id, name)
@@ -60,7 +61,7 @@ const BookCard = ({ id, name, dateOfPrenotation, amount, valid, merchant, token,
                 <div className='grid grid-rows-2'>
                   <Button variant='primary'
                     noRoundDown={true}
-                    onClick={() => { setisopen({ ...merchant, amount }) }}
+                    onClick={() => { setisopen({ ...merchant, amount }, bookId, bookPrenotation) }}
                   >
                     Modifica
                   </Button>
