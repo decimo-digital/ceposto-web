@@ -7,7 +7,7 @@ import initStore from 'state/initStore'
 import { userLogout } from 'state/auth/actions'
 import Head from 'next/head'
 import Dialog from 'components/Dialog'
-import { axiosPrenotation, axiosMenu } from 'utils/axiosInstance'
+import { axiosPrenotation, axiosMenu, axiosUsers } from 'utils/axiosInstance'
 import { useSelector, useDispatch } from 'react-redux'
 import MerchantCard from 'components/MerchantCard'
 import BookCard from 'components/BookCard'
@@ -24,17 +24,23 @@ import { getMerchantPrenotations, updatePrenotation } from 'state/prenotations/a
 const Manage = (props) => {
   const dispatch = useDispatch()
   const user = useSelector(state => state.user)
-  const myMerchants = useSelector(state => state
-    .merchants.merchants
-    .filter(merchant => merchant.owner === user.id)
-  )
-
+  const myMerchants = props.merchants
   const [alert, setAlert] = useState(false)
   const [isOpenBookDialog, setIsOpenBookDialog] = useState(false)
   const [isOpenMenuDialog, setIsOpenMenuDialog] = useState(false)
   const [isOpenAddMerchantDialog, setIsOpenAddMerchantDialog] = useState(false)
-  const [merchantInManage, setMerchantInManage] = useState({ id: -1, name: '' })
-  const prenotations = useSelector(state => state.prenotations.prenotations)
+  const [merchantInManage, setMerchantInManage] = useState({
+    id: -1,
+    storeName: '',
+    cuisineType: '',
+    description: '',
+    enabled: true,
+    freeSeats: 0,
+    occupancyRate: 0,
+    owner: -1,
+    totalSeats: 0,
+  })
+  const prenotations = useSelector(state => state.prenotations?.prenotations)
   const [isAddingItemToMenu, setIsAddingItemToMenu] = useState(false)
   let [newItems, setNewItems] = useState([])
   const [isOpenPrenotationPatchDialog, setIsOpenPrenotationPatchDialog] = useState(false)
@@ -44,6 +50,7 @@ const Manage = (props) => {
   const [selectedPrenotation, setSelectedPrenotation] = useState(0)
   const [selectedPrenotationDate, setSelectedPrenotationDate] = useState(0)
   const menu = useSelector(state => state.merchants.menu)
+
 
   async function onErrorDismiss(name, id) {
     setAlert({
@@ -126,7 +133,6 @@ const Manage = (props) => {
   }
 
   useEffect(() => {
-    console.log(selectedMerchant)
     setRequestingSeats(selectedMerchant.amount)
   }, [selectedMerchant])
 
@@ -165,6 +171,7 @@ const Manage = (props) => {
   const addNewMerchant = async (merchantInfos) => {
     try {
       await dispatch(addMerchant(merchantInfos))
+      myMerchants.push(merchantInfos)
       setAlert({
         type: 'success',
         title: ` ${merchantInfos.storeName} inserito correttamente!`,
@@ -288,24 +295,24 @@ const Manage = (props) => {
               <div>
                 {
                   myMerchants.map(
-                    ({ id, storeName }) => {
+                    (merchant) => {
                       return <MerchantCard
-                        id={id}
-                        name={storeName}
+                        id={merchant.id}
+                        name={merchant.storeName}
                         description={''}
-                        image={''}
+                        image={merchant.image}
                         type={'short'}
                         isFromMenage={true}
                         onClick={async () => {
                           //await getPrenotation({ merchantId: id })
-                          await dispatch(getMerchantPrenotations(id))
-                          setMerchantInManage({ id, name: storeName })
+                          await dispatch(getMerchantPrenotations(merchant.id))
+                          setMerchantInManage(merchant)
                           setIsOpenBookDialog(true)
                         }}
                         onClickMenu={
                           async () => {
-                            setMerchantInManage({ id, name: storeName })
-                            await getMenuInPlace({ merchantId: id })
+                            setMerchantInManage(merchant)
+                            await getMenuInPlace({ merchantId: merchant.id })
                             setIsOpenMenuDialog(true)
                           }
                         }
@@ -331,7 +338,7 @@ const Manage = (props) => {
           <h2 className='font-medium text-2xl text-gray-500'>
             Prenotazioni di {merchantInManage.name}
           </h2>
-          {prenotations.length > 0
+          {typeof prenotations !== 'undefined' && prenotations.length > 0
             ? prenotations
               .sort((a, b) => a.valid < b.valid)
               .map(
@@ -339,17 +346,12 @@ const Manage = (props) => {
                   return (
                     <BookCard
                       id={book.id}
-                      name={
-                        myMerchants.filter(
-                          merchant => merchant.id === book.merchantId
-                        )[0].storeName
-                      }
+                      name={merchantInManage.storeName}
                       dateOfPrenotation={book.dateOfPrenotation}
                       amount={book.amount}
                       valid={book.valid}
-                      merchant={myMerchants.filter(
-                        merchant => merchant.id === book.merchantId
-                      )[0]}
+                      enabled={book.enabled}
+                      merchant={merchantInManage}
                       token={props.token}
                       onSuccessfullDismiss={onSuccessfullDismiss}
                       onErrorDismiss={onErrorDismiss}
@@ -366,7 +368,6 @@ const Manage = (props) => {
       <Dialog
         isOpen={isOpenMenuDialog}
         handleDismiss={() => {
-
           setIsAddingItemToMenu(false)
           setNewItems([])
           setIsOpenMenuDialog(false)
@@ -377,7 +378,7 @@ const Manage = (props) => {
 
           <div className='flex text-3xl items-center'>
             <h2 className='font-medium text-2xl text-gray-500'>
-              Menu di {merchantInManage.name}
+              Menu di {merchantInManage.storeName}
             </h2>
             <div className='mr-auto ml-4'>
               <Button
@@ -388,26 +389,27 @@ const Manage = (props) => {
                 variant={'primary'}
               >+</Button></div>
           </div>
-          {typeof menu !== 'undefined' && (menu.items).length > 0
+          {(typeof menu !== 'undefined' && (menu.items).length > 0) || isAddingItemToMenu
             ? <>
               {
                 isAddingItemToMenu && (
-                  newItems.map(
-                    newItem => {
-                      return (
-                        <MenuCard
-                          id={-1}
-                          name={''}
-                          price={0}
-                          categoryId={1}
-                          updateMenuItem={updateMenuItem}
-                          deleteMenuItem={deleteMenuItem}
-                          addMenuItem={addMenuItem}
-                          merchantId={merchantInManage.id}
-                        />
-                      )
-                    }
-                  )
+                  newItems.
+                    map(
+                      newItem => {
+                        return (
+                          <MenuCard
+                            id={-1}
+                            name={''}
+                            price={0}
+                            categoryId={1}
+                            updateMenuItem={updateMenuItem}
+                            deleteMenuItem={deleteMenuItem}
+                            addMenuItem={addMenuItem}
+                            merchantId={merchantInManage.id}
+                          />
+                        )
+                      }
+                    )
                 )
               }
               {
@@ -614,8 +616,11 @@ Manage.getInitialProps = async (context) => {
         `?userId=${idCurrentUser}`,
         { headers: { 'access-token': token } }
       )
+      const { data: merchants } = await axiosUsers.get('/merchants',
+        { headers: { 'access-token': token } })
 
       return {
+        merchants,
         prenotations,
         token,
         initialReduxState: reduxStore.getState()

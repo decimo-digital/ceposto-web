@@ -142,7 +142,7 @@ const Index = () => {
         <Container>
           <div className="flex flex-col h-auto max-w-md mx-auto">
             <img
-              src=""
+              src="/ceposto.png"
               className="h-40 p-4 text-white text-center"
               alt="Logo CePosto"
             />

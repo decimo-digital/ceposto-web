@@ -1,6 +1,5 @@
 import Link from 'next/link'
 const MerchantCard = ({ id, name, description, image, type, isFromMenage = false, onClick, onClickMenu }) => {
-  console.log(id, name, (Math.random() * 5).toFixed(0))
   switch (type) {
     case 'full':
       return (

@@ -52,7 +52,6 @@ function UserForm({
   const pivaStatus = isObjectEmpty(hasPiva) ? 1 : hasPiva.status_id
 
   let [duplicateEmail, setIsDuplicateEmail] = useState(() => {
-    console.log('user', user)
     return user.id
       ? duplicateMailCheckStatuses.IS_NOT_DUPLICATE
       : duplicateMailCheckStatuses.CHECKING

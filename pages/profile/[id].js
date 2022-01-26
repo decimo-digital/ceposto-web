@@ -18,6 +18,10 @@ import { axiosPrenotation } from 'utils/axiosInstance'
 import InputBook from 'components/InputBook'
 import { signOut } from "next-auth/react"
 import { getUserPrenotations, updatePrenotation } from 'state/prenotations/actions'
+import { Field, Form, Formik, isObject } from 'formik'
+import Input from 'components/Input'
+import { addEmptyItemMenu, addMerchant, getMerchants } from 'state/units/actions'
+import { setUserMerchant } from 'state/user/actions'
 
 const Profile = (props) => {
   const dispatch = useDispatch()
@@ -36,6 +40,7 @@ const Profile = (props) => {
   const [selectedPrenotation, setSelectedPrenotation] = useState(0)
   const [selectedPrenotationDate, setSelectedPrenotationDate] = useState(0)
   const [isSendingRequest, setIsSendingRequest] = useState(false)
+  const [isOpenAddMerchantDialog, setIsOpenAddMerchantDialog] = useState(false)
   const openUpdate = (merchant, bookId, bookDate) => {
     setSelectedPrenotation(bookId)
     setSelectedPrenotationDate(bookDate)
@@ -44,8 +49,28 @@ const Profile = (props) => {
 
   }
 
+  const addNewMerchant = async (merchantInfos) => {
+    try {
+      await dispatch(addMerchant(merchantInfos))
+      await dispatch(setUserMerchant())
+      setAlert({
+        type: 'success',
+        title: ` ${merchantInfos.storeName} inserito correttamente!`,
+        body: `Vai nella sezione GESTIONE per completare le info del tuo ristorante`
+      })
+      setIsOpenAddMerchantDialog(false)
+    } catch (err) {
+      console.error(err)
+      setAlert({
+        type: 'error',
+        title: 'Qualcosa è andato storto',
+        body: 'Si prega di riprovare tra qualche minuto',
+        animate: true
+      })
+    }
+  }
+
   useEffect(() => {
-    console.log(selectedMerchant)
     setRequestingSeats(selectedMerchant.amount)
   }, [selectedMerchant])
 
@@ -90,7 +115,6 @@ const Profile = (props) => {
   const modifyPrenotation = async () => {
     console.log('Modifico prenotazione...')
     setIsSendingRequest(true)
-    console.log('-->', selectedPrenotationDate)
     const patchBody = {
       id: selectedPrenotation,
       merchantId: selectedMerchant.id,
@@ -141,11 +165,6 @@ const Profile = (props) => {
         console.log('No good')
     }
   }
-
-  useEffect(() => {
-    console.log(isOpenDialog)
-  }, [isOpenDialog])
-
   return (
     <>
       <Head>
@@ -167,20 +186,47 @@ const Profile = (props) => {
                 >ESCI
                 </Button>
               </div>
+              {
+                typeof user !== 'undefined' && typeof user.merchant !== 'undefined' && user.merchant !== true
+                && (
+                  <div className='p-3'>
+                    <Button
+                      onClick={() => { setIsOpenAddMerchantDialog(true) }}
+                      variant={'primary'}
+                    >
+                      SEI UN ESERCENTE? CLICCA QUI
+                    </Button></div>
+                )
+              }
+
 
               <p className={`w-1/2 text-left mx-auto rounded border-6 border-gray-400
                p-3`}>
-                Nome: {(user.firstName).split(' ')[0]}<br />
-                Cognome: {user.lastName}<br />
-                Email: {user.email} <br />
+                Nome: {
+                  typeof user !== 'undefined' && typeof user.firstName !== 'undefined'
+                    ? (user.firstName).split(' ')[0]
+                    : ''
+                }<br />
+                Cognome: {
+                  typeof user !== 'undefined' && typeof user.lastName !== 'undefined'
+                    ? user?.lastName
+                    : ''
+
+                }<br />
+                Email: {
+                  typeof user !== 'undefined' && typeof user.email !== 'undefined'
+                    ? user?.email
+                    : ''
+                } <br />
               </p>
 
             </div>
+
             <div id='books' className='w-full text-center'>
               <h2 className='text-center text-3xl'>Le mie prenotazioni</h2>
               <p className={`w-1/2 text-left mx-auto rounded border-6 border-gray-400
                p-3`}>
-                {prenotations
+                {typeof prenotations !== 'undefined' && prenotations
                   .filter(book => book.owner === user.id).length > 0
                   ? prenotations
                     .filter(book => book.owner === user.id)
@@ -201,6 +247,7 @@ const Profile = (props) => {
                             merchant={merchants.filter(
                               merchant => merchant.id === book.merchantId
                             )[0]}
+                            enabled={book.enabled}
                             token={props.token}
                             onSuccessfullDismiss={onSuccessfullDismiss}
                             onErrorDismiss={onErrorDismiss}
@@ -269,6 +316,98 @@ const Profile = (props) => {
         </div>
 
       </Dialog>
+
+      <Dialog
+        isOpen={isOpenAddMerchantDialog}
+        handleDismiss={() => {
+          setIsOpenAddMerchantDialog(false)
+        }}
+        type='prenotation'
+      >
+        <div className="mt-4 space-y-8">
+          <h2 className='font-medium text-2xl text-gray-500'>
+            Aggiungi il tuo primo ristorante
+          </h2>
+          <Formik
+            initialValues={{
+              storeName: '',
+              storeDescription: '',
+              totalSeats: 0
+            }}
+            validate={(values) => {
+              const errors = {}
+              //check su input
+              return errors
+            }}
+            onSubmit={async (values, actions) => {
+              await addNewMerchant({
+                storeName: values.storeName,
+                description: values.storeDescription,
+                totalSeats: values.totalSeats,
+                distance: 0,
+                cuisineType: values.cuisineType,
+                owner: user.id,
+                freeSeats: values.totalSeats,
+                occupancyRate: 0
+              })
+            }}
+          >
+            {({ values, errors, setFieldValue, isSubmitting }) => (
+              <Form>
+                <div className="space-y-8">
+                  <div className="grid grid-cols-2 md:space-x-4 col-gap-4 space-y-2 md:grid-cols-2 xl:grid-cols-2 sm:space-y-0">
+                    <Field name="storeName">
+                      {({ field, form: { touched, errors }, meta }) => (
+                        <Input
+                          name={field.storeName}
+                          type="text"
+                          label="Nome ristorante"
+                          isRequired={false}
+                          isInvalid={touched.storeName && errors.storeName}
+                          invalidText={errors.storeName}
+                          {...field}
+                        />
+                      )}
+                    </Field>
+                    <Field name="totalSeats">
+                      {({ field, form: { touched, errors }, meta }) => (
+                        <Input
+                          name={field.totalSeats}
+                          type="number"
+                          label="Numero coperti"
+                          isRequired={false}
+                          min={0}
+                          isInvalid={touched.totalSeats && errors.totalSeats}
+                          {...field}
+                        />
+                      )}
+                    </Field>
+                  </div>
+                  <div className="grid grid-cols-1 md:space-x-4 col-gap-4 space-y-2 md:grid-cols-2 xl:grid-cols-2 sm:space-y-0">
+                    <div>
+                      <p>Descrizione</p>
+                      <textarea
+                        className="w-full text-gray-700 border-2 rounded-md border-gray-300 bg-white border-opacity-5 h-24 min-h-24"
+                        value={values.storeDescription}
+                        onChange={(e) => {
+                          setFieldValue('storeDescription', e.target.value)
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <Button
+                    variant="primary"
+                  >
+                    CONFERMA
+                  </Button>
+
+                </div>
+              </Form>
+            )}
+          </Formik>
+        </div>
+      </Dialog>
     </>
   )
 }
@@ -294,11 +433,6 @@ Profile.getInitialProps = async (context) => {
       const username = reduxStore.getState().auth.username
       await initStore(reduxStore, token, username)
       const idCurrentUser = reduxStore.getState().user.id
-
-      // const { data: prenotations } = await axiosPrenotation.get(
-      //   `?userId=${idCurrentUser}`,
-      //   { headers: { 'access-token': token } }
-      // )
 
       await reduxStore.dispatch(getUserPrenotations(idCurrentUser))
 

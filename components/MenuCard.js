@@ -22,7 +22,6 @@ const MenuCard = ({ id, name, price, categoryId, merchantId, updateMenuItem, del
   const [submitLabel, setSubmitLabel] = useState(name === '' ? 'Inserisci piatto' : 'Conferma modifiche')
   const [isVisible, setIsVisible] = useState(true)
   const [isDeleting, setIsDeleting] = useState(false)
-  console.log(categoryId, selectedCategory)
   return (
     isVisible && (
       <div className="">
@@ -57,8 +56,12 @@ const MenuCard = ({ id, name, price, categoryId, merchantId, updateMenuItem, del
                         const result = await addMenuItem(values, selectedCategory, merchantId)
                         if (typeof result !== 'undefined') setSubmitLabel('Nuovo')
                       }
-                      else
-                        updateMenuItem(values, selectedCategory, merchantId)
+                      else {
+                        await updateMenuItem(values, selectedCategory, merchantId)
+                        setSubmitLabel('Conferma modifiche')
+                      }
+
+
                     }
                     else setIsDeleting(false)
 

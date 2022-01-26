@@ -1,8 +1,6 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from "next-auth/providers/google";
 import { axiosAuth } from 'utils/axiosInstance';
-import cookie from 'js-cookie'
-import { addGoogleToken } from 'utils/addGoogleToken';
 
 const options = {
   // Configure one or more authentication providers

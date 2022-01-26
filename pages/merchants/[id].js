@@ -43,14 +43,6 @@ const Merchants = (props) => {
       },
         { headers: { 'access-token': props.token } }
       )
-      console.log(response,
-        {
-          merchantId: currentMerchant.id,
-          seatsAmount: requestingSeats,
-          date: dayjs().valueOf(),
-          requesterId: user.id
-        }
-      )
       await dispatch(
         updateMerchantFreeSeats({
           merchantId: currentMerchant.id,

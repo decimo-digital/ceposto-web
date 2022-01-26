@@ -29,11 +29,9 @@ function PhaseTwo({
         opacity: { duration: 0.5 },
         transform: { duration: 0.5 }
       }}
-      className={`flex flex-col rounded-b bg-white mx-auto ${
-        currSignupStage === 1 ? 'h-auto' : 'h-0'
-      } w-full max-w-md shadow-md ${
-        currSignupStage === 1 ? 'px-8 sm:px-20 pb-12' : 'p-0'
-      }`}
+      className={`flex flex-col rounded-b bg-white mx-auto ${currSignupStage === 1 ? 'h-auto' : 'h-0'
+        } w-full max-w-md shadow-md ${currSignupStage === 1 ? 'px-8 sm:px-20 pb-12' : 'p-0'
+        }`}
     >
       <div className="flex flex-col items-center">
         <h2 className="text-2xl text-gray-500">Accettazione contratto</h2>
@@ -66,7 +64,7 @@ function PhaseTwo({
                 source: 'CLIENT_WEB'
               }
 
-              console.log(data)
+
 
               const pendingRegistrationResponse = await axiosAuth.post(
                 '/pendingRegistration',

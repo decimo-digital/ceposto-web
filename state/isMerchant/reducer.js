@@ -5,7 +5,6 @@ const isMerchantReducer = (state = 0, action) => {
 
   switch (type) {
     case SET_IS_MERCHANT:
-      console.log(payload.isMerchant, payload)
       return payload.isMerchant
     default:
       return state

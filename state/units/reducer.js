@@ -38,7 +38,6 @@ const merchantsReducer = (state = {}, action) => {
       }
 
     case ADD_EMPTY_MENU:
-      console.log('diocane', payload)
       return {
         ...state, menu:
         {

@@ -57,7 +57,6 @@ const Home = (props) => {
           ((merchant.storeName).toLowerCase()).includes(filter))
         .length / 10) + 1).toFixed(0))
     )
-    console.log(pageCount)
   }, [filter])
 
   return (

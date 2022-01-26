@@ -13,7 +13,6 @@ const getUserPrenotations = (userId) => {
       `?userId=${userId}`,
       { headers: { 'access-token': token } }
     )
-
     dispatch({
       type: 'GET_PRENOTATIONS',
       payload: {
@@ -23,7 +22,7 @@ const getUserPrenotations = (userId) => {
   }
 }
 
-const getMerchantPrenotations = (userId) => {
+const getMerchantPrenotations = (merchantId) => {
   return async (dispatch, getState) => {
     const { token } = getState().auth
 
@@ -44,8 +43,6 @@ const getMerchantPrenotations = (userId) => {
 const updatePrenotation = ({ prenotationId, requestingSeats }) => {
   return async (dispatch, getState) => {
     const { token } = getState().auth
-
-    console.log('update')
 
     dispatch({
       type: 'UPDATE_PRENOTATION',

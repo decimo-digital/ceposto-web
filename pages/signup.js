@@ -91,7 +91,6 @@ const Signup = () => {
   }
 
   async function onSuccesfullRegistration(token, email, isMerchant = false) {
-    console.log('Sto facendo la login con ', token)
     try {
       await Promise.all([
         dispatch(setIsMerchant(isMerchant)),
@@ -161,7 +160,6 @@ const Signup = () => {
             data
           )
           const { accessToken } = registrationResponse
-          console.log(accessToken)
           if (accessToken) {
             onSuccesfullRegistration(accessToken, email, isMerchant)
           }
@@ -191,7 +189,7 @@ const Signup = () => {
         <Container>
           <div className="flex flex-col h-auto max-w-md mx-auto text-white">
             <img
-              src=""
+              src="/CePosto.png"
               className="h-40 p-4"
               alt="Logo CePosto"
             />

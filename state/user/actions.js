@@ -5,6 +5,7 @@ import { axiosUsers } from '../../utils/axiosInstance'
 const GET_USER = 'GET_USER'
 const GET_USER_TICKETS = 'GET_USER_TICKETS'
 const UPDATE_USER = 'UPDATE_USER'
+const SET_USER_IS_MERCHANT = 'SET_USER_IS_MERCHANT'
 
 // Actions
 const getUserByEmail = email => {
@@ -69,13 +70,21 @@ const updateUser = updatedField => {
   }
 }
 
+const setUserMerchant = () => {
+  console.log('setUserMerchant')
+  return async (dispatch, getState) => {
+    dispatch({ type: SET_USER_IS_MERCHANT })
+  }
+}
 
 
 export {
   GET_USER,
   GET_USER_TICKETS,
   UPDATE_USER,
+  SET_USER_IS_MERCHANT,
   getUserByEmail,
   getUserTickets,
   updateUser,
+  setUserMerchant
 }

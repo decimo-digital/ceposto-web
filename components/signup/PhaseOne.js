@@ -16,7 +16,6 @@ function PhaseOne({
   handleFieldCheckBox,
   isSendingRequest = false
 }) {
-  console.log(fields.isMerchant)
   return (
     <>
       <motion.div

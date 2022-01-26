@@ -20,7 +20,6 @@ const ADD_EMPTY_MENU = 'ADD_EMPTY_MENU'
 
 // Merchants
 const getMerchants = () => {
-  console.log('\nGetMerchants')
   return async (dispatch, getState) => {
     const { token } = getState().auth
 
@@ -40,10 +39,12 @@ const addMerchant = (merchantInfos) => {
   return async (dispatch, getState) => {
     const { token } = getState().auth
 
-    await axiosMerchant.post(
+    const result = await axiosMerchant.post(
       `/`, merchantInfos,
       { headers: { 'access-token': token } }
     )
+
+    merchantInfos.id = result.data.id
 
     dispatch({
       type: 'ADD_MERCHANT',
@@ -53,7 +54,6 @@ const addMerchant = (merchantInfos) => {
 }
 
 const updateMerchantFreeSeats = ({ merchantId, updatedFreeSeats }) => {
-  console.log('\nupdateMerchantFreeSeats')
   return async (dispatch, getState) => {
     const { token } = getState().auth
 

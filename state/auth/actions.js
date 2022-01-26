@@ -14,7 +14,6 @@ const userLogin = (token, email) => {
       secure: true,
       sameSite: 'Lax'
     } //, httpOnly: true }
-    console.log(cookie.get('token'), typeof cookie.get('token'))
     if (typeof cookie.get('token') === 'undefined') {
       cookie.set('token', token, options)
     }

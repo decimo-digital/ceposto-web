@@ -1,21 +1,10 @@
 import dayjs from 'dayjs'
 import { axiosPrenotation } from 'utils/axiosInstance'
 import Button from './Button'
-const BookCard = ({ id, name, dateOfPrenotation, amount, valid, merchant, token, onSuccessfullDismiss, onErrorDismiss, setisopen }) => {
+const BookCard = ({ id, name, dateOfPrenotation, amount, valid, enabled, merchant, token, onSuccessfullDismiss, onErrorDismiss, setisopen }) => {
   const bookId = id
   const bookPrenotation = dateOfPrenotation
   const dismissPrenotation = async () => {
-    const dismissBody = {
-      id,
-      owner: merchant.owner,
-      merchantId: merchant.id,
-      dateOfPrenotation: dateOfPrenotation,
-      date: dateOfPrenotation,
-      amount: amount,
-      enabled: false,
-      valid: false
-    }
-
     try {
       await axiosPrenotation.delete(
         `/${bookId}`,
@@ -36,7 +25,7 @@ const BookCard = ({ id, name, dateOfPrenotation, amount, valid, merchant, token,
 
           <div v-for="card in cards" className={`flex flex-col md:flex-row overflow-hidden
                                           rounded-lg shadow-xl  mt-4 w-100 mx-2
-                                          ${valid
+                                          ${enabled && valid
               ? 'bg-green-100'
               : 'bg-red-200'
             }
@@ -57,7 +46,7 @@ const BookCard = ({ id, name, dateOfPrenotation, amount, valid, merchant, token,
               </p>
             </div>
             {
-              valid && (
+              (enabled && valid) && (
                 <div className='grid grid-rows-2'>
                   <Button variant='primary'
                     noRoundDown={true}
