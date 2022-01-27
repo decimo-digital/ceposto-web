@@ -185,15 +185,9 @@ const Signup = () => {
       <Head>
         <title>CePosto | Registrati</title>
       </Head>
-      <div className="flex items-center justify-center w-full bg-black">
+      <div className="flex items-center justify-center w-full bg-black pt-12">
         <Container>
-          <div className="flex flex-col h-auto max-w-md mx-auto text-white">
-            <img
-              src="/CePosto.png"
-              className="h-40 p-4"
-              alt="Logo CePosto"
-            />
-          </div>
+
           <PhaseOne
             alert={alert}
             variants={variants}

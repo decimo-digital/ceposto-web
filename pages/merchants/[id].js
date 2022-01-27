@@ -111,7 +111,7 @@ const Merchants = (props) => {
           <AlertFloat alert={alert} setAlert={setAlert} />
         )}
 
-        <div className="md:flex md:space-x-10 items-center bg-black p-24">
+        <div className={`md:flex md:space-x-10 items-center bg-black p-24`}>
           <div className="w-full h-full text-center">
 
             <p className='bold text-5xl text-white'> {currentMerchant.storeName} </p>
@@ -158,7 +158,7 @@ const Merchants = (props) => {
             }
 
 
-            <div className='container w-100 lg:w-4/5 mx-auto flex flex-col'>
+            <div className='container w-100 lg:w-4/5 mx-auto flex flex-col py-3'>
               <div className='p-4 '>Consulta il menù</div>
               <Accordion
                 name='Antipasti'
@@ -176,7 +176,6 @@ const Merchants = (props) => {
               <Accordion
                 name='Pizze'
                 items={menu.items.pizza} />
-              Ai nostri clienti piace anche. . .
               {/* <div className='border border-1 border-gray-200 rounded-md '>
                 {
                   restaurants
@@ -288,7 +287,7 @@ Merchants.getInitialProps = async (context) => {
     const urlCurrentMerchant = Number(context.query.id)
     const username = reduxStore.getState().auth.username
     await initStore(reduxStore, token, username)
-
+    console.log('-->?', reduxStore.getState())
     const { data: merchant } = await axiosMerchant.get(
       `/${urlCurrentMerchant}/data`,
       { headers: { 'access-token': token } }

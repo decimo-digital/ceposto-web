@@ -94,7 +94,7 @@ const Home = (props) => {
               : (
                 <div className='w-full '>
                   <div className="container w-1/2 mx-auto flex flex-col">
-                    Non sono presenti ristoranti. Addio
+                    Non sono presenti ristoranti.
                   </div>
                 </div>
               )
@@ -110,13 +110,15 @@ const Home = (props) => {
                     const {
                       id,
                       storeName,
+                      description,
+                      image
                     } = merchant
                     return (
                       <MerchantCard
                         id={id}
                         name={storeName}
-                        description={''}
-                        image={''}
+                        description={description}
+                        image={image}
                         type={'full'} />
                     )
                   }
@@ -155,24 +157,29 @@ const Home = (props) => {
                         <p className='self-center mx-auto uppercase'>{page}/{pageCount}</p>
                       </div>
                     </Button>
-                    <Button
-                      onClick={() => {
-                        if (page < pageCount) {
-                          window.scrollTo({ top: 0, behavior: 'smooth' })
-                          setPage(page => page += 1)
-                        }
+                    {
+                      (page !== pageCount) && (
+                        <Button
+                          onClick={() => {
+                            if (page < pageCount) {
+                              window.scrollTo({ top: 0, behavior: 'smooth' })
+                              setPage(page => page += 1)
+                            }
 
-                      }}>
-                      <div className="flex flex-col md:flex-row overflow-hidden h-12
-                                             bg-gray-300 rounded-lg shadow-xl  mt-4 w-100 mx-2">
+                          }}>
+                          <div className="flex flex-col md:flex-row overflow-hidden h-12
+                                                 bg-gray-300 rounded-lg shadow-xl  mt-4 w-100 mx-2">
 
 
-                        <p className='self-center mx-auto uppercase'>
-                          avanti
-                        </p>
+                            <p className='self-center mx-auto uppercase'>
+                              avanti
+                            </p>
 
-                      </div>
-                    </Button>
+                          </div>
+                        </Button>
+                      )
+                    }
+
                   </div>
                 </div>
               </div>

@@ -78,7 +78,7 @@ const getMenu = (merchantId, isFromAdmin = false) => {
 
     const { data: menu } = await axiosMenu.get(`/${merchantId}`,
       { headers: { 'access-token': token } })
-
+    console.log(menu)
     if (isFromAdmin)
       dispatch({
         type: 'GET_MENU',

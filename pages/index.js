@@ -20,6 +20,7 @@ import { userLogin, userLogout } from 'state/auth/actions'
 
 import { signIn, useSession } from 'next-auth/react'
 import { getToken } from 'next-auth/jwt'
+import Icon, { icons } from 'components/Icon'
 
 const Index = () => {
   const [alert, setAlert] = useState({})
@@ -141,11 +142,13 @@ const Index = () => {
       <div className="flex flex-col items-center justify-center w-screen min-h-screen space-y-4 bg-black">
         <Container>
           <div className="flex flex-col h-auto max-w-md mx-auto">
-            <img
-              src="/ceposto.png"
-              className="h-40 p-4 text-white text-center"
-              alt="Logo CePosto"
-            />
+            <div className="flex flex-col h-auto max-w-md mx-auto text-white">
+              <img
+                src="/CePosto.png"
+                className="h-40 p-4"
+                alt="Logo CePosto"
+              />
+            </div>
             <div className="flex flex-col h-auto bg-white rounded-md shadow-md">
               {false ? (
                 <>
@@ -153,7 +156,7 @@ const Index = () => {
                   per il disagio e La preghiamo di ritentare più tardi.
                 </>
               ) : (
-                <div className="px-4 py-8 space-y-8 sm:px-12 ">
+                <div className="px-4 py-8 space-y-8 sm:px-12">
                   {!isObjectEmpty(alert) && <Alert {...alert} />}
                   <form
                     className="flex flex-col space-y-8"
@@ -213,11 +216,12 @@ const Index = () => {
 
         </Button> */}
         <Button
+          variant={'google'}
           onClick={async () => {
             const x = await signIn("google", { redirect: false })
           }}
         >
-          googleAuth
+          Login with Google
         </Button>
       </div>
     </>

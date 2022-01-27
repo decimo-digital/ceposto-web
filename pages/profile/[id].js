@@ -56,7 +56,7 @@ const Profile = (props) => {
       setAlert({
         type: 'success',
         title: ` ${merchantInfos.storeName} inserito correttamente!`,
-        body: `Vai nella sezione GESTIONE per completare le info del tuo ristorante`
+        body: `Vai nella sezione GESTORE per completare le info del tuo ristorante`
       })
       setIsOpenAddMerchantDialog(false)
     } catch (err) {
@@ -187,7 +187,7 @@ const Profile = (props) => {
                 </Button>
               </div>
               {
-                typeof user !== 'undefined' && typeof user.merchant !== 'undefined' && user.merchant !== true
+                typeof user !== 'undefined' && typeof user.merchant !== 'undefined' && user.merchant !== true && user.email !== 'esercentenuovo@ceposto.it'
                 && (
                   <div className='p-3'>
                     <Button
@@ -348,7 +348,8 @@ const Profile = (props) => {
                 cuisineType: values.cuisineType,
                 owner: user.id,
                 freeSeats: values.totalSeats,
-                occupancyRate: 0
+                occupancyRate: 0,
+                image: null
               })
             }}
           >

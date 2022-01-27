@@ -20,6 +20,10 @@ const Button = ({
       style += `bg-black shadow text-white ${!disabled ? 'hover:bg-gray-700' : 'opacity-50'
         }`
       break
+    case 'google':
+      style += `bg-red-400 text-white shadow'
+        }`
+      break
     case 'secondary':
       style += `border-2 border-green-500 bg-white text-green-500 ${!disabled ? '' : 'opacity-50'
         }`

@@ -21,6 +21,7 @@ import MenuCard from 'components/MenuCard'
 import { getMenu } from 'state/units/actions'
 import InputBook from 'components/InputBook'
 import { getMerchantPrenotations, updatePrenotation } from 'state/prenotations/actions'
+import { useDropzone } from 'react-dropzone'
 const Manage = (props) => {
   const dispatch = useDispatch()
   const user = useSelector(state => state.user)
@@ -50,7 +51,22 @@ const Manage = (props) => {
   const [selectedPrenotation, setSelectedPrenotation] = useState(0)
   const [selectedPrenotationDate, setSelectedPrenotationDate] = useState(0)
   const menu = useSelector(state => state.merchants.menu)
-
+  const [files, setFiles] = useState()
+  const [inserimentoLabel, setInserimentoLabel] = useState(`Clicca qui per inserire un' immagine`)
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: 'image/*',
+    onDrop: (acceptedFiles) => {
+      setInserimentoLabel('Caricamento...')
+      const image = acceptedFiles[0]
+      const url = URL.createObjectURL(image)
+      console.log(url)
+      const insertedImage = (new Buffer(url)).toString('base64')
+      setFiles(insertedImage)
+      setTimeout(() => {
+        setInserimentoLabel('Caricata con successo!')
+      }, 1000);
+    }
+  })
 
   async function onErrorDismiss(name, id) {
     setAlert({
@@ -267,13 +283,16 @@ const Manage = (props) => {
       })
     }
   }
+  useEffect(() => {
+    console.log(files)
+  }, [files]);
 
 
 
   return (
     <>
       <Head>
-        <title>CePosto | Gestione</title>
+        <title>CePosto | Gestore</title>
       </Head>
       <div className="w-full">
         {!isObjectEmpty(alert) && (
@@ -471,7 +490,8 @@ const Manage = (props) => {
                 cuisineType: values.cuisineType,
                 owner: user.id,
                 freeSeats: values.totalSeats,
-                occupancyRate: 0
+                occupancyRate: 0,
+                image: null
               })
             }}
           >
@@ -518,6 +538,27 @@ const Manage = (props) => {
                       />
                     </div>
                   </div>
+                  <div className="flex-shrink-0">
+
+                    <div
+                      id="logo"
+                      className="cursor-pointer w-32 h-32 border-2 rounded-full bg-black"
+                      {...getRootProps({ className: 'dropzone' })}
+                    >
+                      <input {...getInputProps()} />
+                      <div className={`
+                      ${inserimentoLabel == 'Caricata con successo!'
+                          ? 'cursor-default'
+                          : 'cursor-pointer '
+                        }
+                      
+                      w-1/2 rounded border-black border-dashed bg-gray-200 border-2 p-2`}>
+
+                        {inserimentoLabel}
+                      </div>
+                    </div>
+                  </div>
+
 
                   <Button
                     variant="primary"
